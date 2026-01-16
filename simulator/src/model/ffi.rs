@@ -44,40 +44,19 @@ impl<E, T: Copy> ResultExt2<T> for Result<T, E> {
 }
 
 impl<T: super::PokedexCallbackMem> MakeVTable<T> {
-    unsafe extern "C" fn inst_fetch_2(model: *mut c_void, addr: u32, ret: *mut u16) -> c_int {
+    unsafe extern "C" fn vm_req(model: *mut c_void, vm_info: *mut raw::VirtMemReqInfo) -> c_int {
         let model = unsafe { &mut *(model as *mut T) };
-        model.inst_fetch_2(addr).try_write(ret)
+        let vm_info = unsafe { vm_info.as_mut().expect("invalid vm_info pointer") };
+        todo!()
     }
-    unsafe extern "C" fn read_mem_1(model: *mut c_void, addr: u32, ret: *mut u8) -> c_int {
-        let model = unsafe { &mut *(model as *mut T) };
-        model.read_mem_u8(addr).try_write(ret)
-    }
-    unsafe extern "C" fn read_mem_2(model: *mut c_void, addr: u32, ret: *mut u16) -> c_int {
-        let model = unsafe { &mut *(model as *mut T) };
-        model.read_mem_u16(addr).try_write(ret)
-    }
-    unsafe extern "C" fn read_mem_4(model: *mut c_void, addr: u32, ret: *mut u32) -> c_int {
-        let model = unsafe { &mut *(model as *mut T) };
-        model.read_mem_u32(addr).try_write(ret)
-    }
-    unsafe extern "C" fn write_mem_1(model: *mut c_void, addr: u32, value: u8) -> c_int {
-        let model = unsafe { &mut *(model as *mut T) };
-        model.write_mem_u8(addr, value).to_c_int()
-    }
-    unsafe extern "C" fn write_mem_2(model: *mut c_void, addr: u32, value: u16) -> c_int {
-        let model = unsafe { &mut *(model as *mut T) };
-        model.write_mem_u16(addr, value).to_c_int()
-    }
-    unsafe extern "C" fn write_mem_4(model: *mut c_void, addr: u32, value: u32) -> c_int {
-        let model = unsafe { &mut *(model as *mut T) };
-        model.write_mem_u32(addr, value).to_c_int()
-    }
+
     unsafe extern "C" fn amo_mem_4(
         model: *mut c_void,
         addr: u32,
         amo_op: u8,
         value: u32,
         ret: *mut u32,
+        satp: u32,
     ) -> c_int {
         let model = unsafe { &mut *(model as *mut T) };
         let op = match amo_op as u32 {
@@ -92,9 +71,14 @@ impl<T: super::PokedexCallbackMem> MakeVTable<T> {
             raw::POKEDEX_AMO_MAXU => AtomicOp::Maxu,
             _ => unreachable!("unknown amo opcode ({amo_op})"),
         };
-        model.amo_mem_u32(addr, op, value).try_write(ret)
+        model.amo_mem_u32(addr, op, value, satp).try_write(ret)
     }
-    unsafe extern "C" fn lr_mem_4(model: *mut c_void, _addr: u32, _ret: *mut u32) -> c_int {
+    unsafe extern "C" fn lr_mem_4(
+        model: *mut c_void,
+        _addr: u32,
+        _ret: *mut u32,
+        _satp: u32,
+    ) -> c_int {
         let _model = unsafe { &mut *(model as *mut T) };
         todo!("LR instruction not implemented")
     }
@@ -103,18 +87,13 @@ impl<T: super::PokedexCallbackMem> MakeVTable<T> {
         _addr: u32,
         _value: u32,
         _ret: *mut u32,
+        _satp: u32,
     ) -> c_int {
         let _model = unsafe { &mut *(model as *mut T) };
         todo!("SC instruction not implemented")
     }
     const VTABLE: &raw::pokedex_mem_callback_vtable = &raw::pokedex_mem_callback_vtable {
-        inst_fetch_2: Some(Self::inst_fetch_2),
-        read_mem_1: Some(Self::read_mem_1),
-        read_mem_2: Some(Self::read_mem_2),
-        read_mem_4: Some(Self::read_mem_4),
-        write_mem_1: Some(Self::write_mem_1),
-        write_mem_2: Some(Self::write_mem_2),
-        write_mem_4: Some(Self::write_mem_4),
+        vm_req: Some(Self::vm_req),
         amo_mem_4: Some(Self::amo_mem_4),
         lr_mem_4: Some(Self::lr_mem_4),
         sc_mem_4: Some(Self::sc_mem_4),
