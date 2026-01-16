@@ -2,7 +2,7 @@ constant XLEN : integer = 32;
 
 
 constant PRIV_MODE_MOST : PrivMode = PRIV_MODE_M;
-constant PRIV_MODE_LEAST : PrivMode = PRIV_MODE_M;
+constant PRIV_MODE_LEAST : PrivMode = PRIV_MODE_U;
 
 ////////////////
 //// CONFIG ////
@@ -55,6 +55,7 @@ var MSTATUS_VS : bits(2);
 // MIE csr
 var MEIE : bit;
 var MTIE : bit;
+var MSIE : bit;
 
 func resetArchStateDefault()
 begin
@@ -93,7 +94,9 @@ type XRegIdx of integer{0..31};
 type FRegIdx of integer{0..31};
 
 enumeration PrivMode {
-  PRIV_MODE_M
+  PRIV_MODE_M,
+  PRIV_MODE_S,
+  PRIV_MODE_U
 };
 
 enumeration MtvecMode {
@@ -224,24 +227,40 @@ begin
   return FFI_machine_time_interrupt_pending();
 end
 
+getter getExternal_MSIP => bit
+begin
+  return FFI_machine_software_interrupt_pending();
+end
+
 ///////////////////////////
 //// Utility Functions ////
 ///////////////////////////
 
 func is_valid_privilege(value : bits(2)) => boolean
 begin
-  return value == '11';
+  return value != '10';
 end
 
 func IsPrivAtLeast_M() => boolean
 begin
-  return TRUE;
+  return IsPrivAtLeast(PRIV_MODE_M);
+end
+
+func IsPrivAtLeast(expect : PrivMode) => boolean
+begin
+  case expect of
+    when PRIV_MODE_M => return CURRENT_PRIVILEGE == PRIV_MODE_M;
+    when PRIV_MODE_S => return CURRENT_PRIVILEGE == PRIV_MODE_M || CURRENT_PRIVILEGE == PRIV_MODE_S;
+    when PRIV_MODE_U => return TRUE;
+  end
 end
 
 func privModeToBits(priv : PrivMode, N: integer) => bits(N)
 begin
   case priv of
     when PRIV_MODE_M => return ZeroExtend('11', N);
+    when PRIV_MODE_S => return ZeroExtend('01', N);
+    when PRIV_MODE_U => return ZeroExtend('00', N);
   end
 end
 
@@ -250,6 +269,8 @@ begin
   let mode : integer = UInt(value);
   case mode of
     when 3 => return PRIV_MODE_M;
+    when 1 => return PRIV_MODE_S;
+    when 0 => return PRIV_MODE_U;
     otherwise => assert FALSE;
   end
 end
@@ -265,18 +286,5 @@ end
 // MTIP is controlled by external time interrupt controller in this model, no states will be stored.
 //
 // MSIP and MSIE is not implemented since we have support only one hart.
-let MACHINE_TIMER_INTERRUPT = 7;
-let MACHINE_EXTERNAL_INTERRUPT = 11;
-
-// export to simulator
-func ASL_ResetConfigAndState()
-begin
-  initConfigDefault();
-  resetArchStateDefault();
-end
-
-// export to simulator
-func ASL_ResetState()
-begin
-  resetArchStateDefault();
-end
+constant MACHINE_TIMER_INTERRUPT = 7;
+constant MACHINE_EXTERNAL_INTERRUPT = 11;
