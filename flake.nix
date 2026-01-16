@@ -5,6 +5,10 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    pokedex-configs-src = {
+      url = "git+ssh://git@github.com/xinpian-tech/pokedex-configs.git?ref=master";
+      flake = false;
+    };
   };
 
   outputs =
@@ -16,7 +20,7 @@
       ...
     }:
     let
-      overlay = import ./nix/overlay.nix;
+      overlay = import ./nix/overlay.nix { inherit (inputs) pokedex-configs-src; };
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
       # Add supported platform here

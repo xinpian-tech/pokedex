@@ -65,10 +65,28 @@
         "type": "github"
       }
     },
+    "pokedex-configs-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1768554516,
+        "narHash": "sha256-RNFaSc2o522fW4eFzf14vam2B3ZogafF9AunxMnz8hc=",
+        "ref": "master",
+        "rev": "32b8b3a69f3e2fb1b44accaa332142e55e29a621",
+        "revCount": 1,
+        "type": "git",
+        "url": "ssh://git@github.com/xinpian-tech/pokedex-configs.git"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "ssh://git@github.com/xinpian-tech/pokedex-configs.git"
+      }
+    },
     "root": {
       "inputs": {
         "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs",
+        "pokedex-configs-src": "pokedex-configs-src",
         "treefmt-nix": "treefmt-nix"
       }
     },
