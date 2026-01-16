@@ -2,12 +2,13 @@
   lib,
   newScope,
   riscv-opcodes-src,
+  pokedex-configs-src,
 }:
 let
   mkScope =
     parentScope: builder:
     with lib;
-    builtins.readDir ./model/configs
+    builtins.readDir pokedex-configs-src
     |> filterAttrs (k: v: hasSuffix ".toml" k && v == "regular")
     |> mapAttrs' (
       fp: _:
@@ -16,7 +17,7 @@ let
           scope:
           builder rec {
             inherit scope;
-            configsPath = ./model/configs/${fp};
+            configsPath = "${pokedex-configs-src}/${fp}";
             configs = importTOML configsPath;
           }
         )

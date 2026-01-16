@@ -1,4 +1,8 @@
+{ pokedex-configs-src }:
+
 final: prev: rec {
+  inherit pokedex-configs-src;
+
   pokedex = final.callPackage ../package.nix { };
 
   asl-interpreter = final.callPackage ./pkgs/asl-interpreter.nix { };

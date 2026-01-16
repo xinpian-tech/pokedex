@@ -1,4 +1,6 @@
 cfg := "full"
+config_dir := ""
+nix_args := if config_dir != "" { "--override-input pokedex-configs path:" + config_dir } else { "" }
 
 [no-exit-message]
 default:
@@ -6,7 +8,7 @@ default:
 
 guidance:
   @echo "Compiling Document"
-  @nix build '.#pokdex.{{cfg}}.docs.guidance'
+  @nix {{nix_args}} build '.#pokdex.{{cfg}}.docs.guidance'
   @echo "File store in ./result/doc.pdf"
 
 build target:
@@ -23,26 +25,26 @@ compile target:
 
 
 _build-model:
-  @nix build '.#pokedex.{{cfg}}.model' -L --out-link result-model
+  @nix {{nix_args}} build '.#pokedex.{{cfg}}.model' -L --out-link result-model
   @echo "Result store in result-model/"
 
 _build-simulator:
-  @nix build '.#pokedex.simulator' -L --out-link result-simulator
+  @nix {{nix_args}} build '.#pokedex.simulator' -L --out-link result-simulator
   @echo "Result store in result-simulator/"
 
 
 _develop-model:
-  @cd model && nix develop '.#pokedex.{{cfg}}.model'
+  @cd model && nix {{nix_args}} develop '.#pokedex.{{cfg}}.model'
 
 _develop-simulator:
-  @cd simulator && nix develop '.#pokedex.simulator.shell'
+  @cd simulator && nix {{nix_args}} develop '.#pokedex.simulator.shell'
 
 
 _compile-model:
   @echo "Debug compiling ASL model with config {{cfg}}"
-  @cd model && nix develop '.#pokedex.{{cfg}}.model' \
+  @cd model && nix {{nix_args}} develop '.#pokedex.{{cfg}}.model' \
     -c bash -c 'source "$stdenv/setup" && runPhase configurePhase && runPhase buildPhase'
 
 _compile-simulator:
   @echo "Debug compiling simulator"
-  @cd simulator && nix develop '.#pokedex.simulator.shell' -c cargo build
+  @cd simulator && nix {{nix_args}} develop '.#pokedex.simulator.shell' -c cargo build
