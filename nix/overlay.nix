@@ -13,6 +13,8 @@ final: prev: rec {
 
   rv32-llvm-compiler-rt = final.callPackage ./pkgs/rv32-llvm-compiler-rt.nix { };
 
+  berkeley-softfloat = final.callPackage ./pkgs/berkeley-softfloat.nix { };
+
   rv32-stdenv =
     let
       rv32Pkgs = final.pkgsCross.riscv32-embedded;
