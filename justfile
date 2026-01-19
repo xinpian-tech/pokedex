@@ -1,6 +1,6 @@
 cfg := "full"
 config_dir := ""
-nix_args := if config_dir != "" { f"--override-input pokedex-configs path:{{config_dir}}" } else { "" }
+nix_args := if config_dir != "" { f"--override-input pokedex-configs-src path:{{canonicalize(config_dir)}}" } else { "" }
 
 [default]
 [no-exit-message]
@@ -16,17 +16,17 @@ guidance:
 # Build Targets: model, simulator
 build target:
   @echo "Building {{target}} with config {{cfg}}"
-  @just _build-{{target}}
+  @just nix_args="{{nix_args}}" _build-{{target}}
 
 # Develop Targets: model, simulator
 develop target:
   @echo "Entering {{target}} shell"
   @echo
-  @just _develop-{{target}}
+  @just nix_args="{{nix_args}}" _develop-{{target}}
 
 # Compile Targets: model, simulator
 compile target:
-  @just _compile-{{target}}
+  @just nix_args="{{nix_args}}" _compile-{{target}}
 
 
 _build-model:
@@ -49,9 +49,11 @@ _develop-simulator:
 
 [working-directory: 'model']
 _compile-model:
-  #!/usr/bin/env -S nix {{nix_args}} develop '.#pokedex.{{cfg}}.model' -c bash
+  #!/usr/bin/env -S nix develop {{nix_args}} '.#pokedex.{{cfg}}.model' -c bash
   set -euo pipefail
-  echo "Debug compiling ASL model with config {{cfg}}"
+  echo
+  echo "Debug compiling ASL model with config {{BG_BLUE}}{{BOLD}}{{cfg}}{{NORMAL}}"
+  echo
   source "$stdenv/setup"
   runPhase configurePhase
   runPhase buildPhase
