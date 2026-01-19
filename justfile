@@ -1,25 +1,30 @@
 cfg := "full"
 config_dir := ""
-nix_args := if config_dir != "" { "--override-input pokedex-configs path:" + config_dir } else { "" }
+nix_args := if config_dir != "" { f"--override-input pokedex-configs path:{{config_dir}}" } else { "" }
 
+[default]
 [no-exit-message]
-default:
-  @just --choose
+_default:
+  @just --list --unsorted
 
+# Build PDF guidance
 guidance:
   @echo "Compiling Document"
   @nix {{nix_args}} build '.#pokdex.{{cfg}}.docs.guidance'
   @echo "File store in ./result/doc.pdf"
 
+# Build Targets: model, simulator
 build target:
   @echo "Building {{target}} with config {{cfg}}"
   @just _build-{{target}}
 
+# Develop Targets: model, simulator
 develop target:
   @echo "Entering {{target}} shell"
   @echo
   @just _develop-{{target}}
 
+# Compile Targets: model, simulator
 compile target:
   @just _compile-{{target}}
 
@@ -33,18 +38,25 @@ _build-simulator:
   @echo "Result store in result-simulator/"
 
 
+[working-directory: 'model']
 _develop-model:
-  @cd model && nix {{nix_args}} develop '.#pokedex.{{cfg}}.model'
+  @nix {{nix_args}} develop '.#pokedex.{{cfg}}.model'
 
+[working-directory: 'simulator']
 _develop-simulator:
-  @cd simulator && nix {{nix_args}} develop '.#pokedex.simulator.shell'
+  @nix {{nix_args}} develop '.#pokedex.simulator.shell'
 
 
+[working-directory: 'model']
 _compile-model:
-  @echo "Debug compiling ASL model with config {{cfg}}"
-  @cd model && nix {{nix_args}} develop '.#pokedex.{{cfg}}.model' \
-    -c bash -c 'source "$stdenv/setup" && runPhase configurePhase && runPhase buildPhase'
+  #!/usr/bin/env -S nix {{nix_args}} develop '.#pokedex.{{cfg}}.model' -c bash
+  set -euo pipefail
+  echo "Debug compiling ASL model with config {{cfg}}"
+  source "$stdenv/setup"
+  runPhase configurePhase
+  runPhase buildPhase
 
+[working-directory: 'simulator']
 _compile-simulator:
   @echo "Debug compiling simulator"
-  @cd simulator && nix {{nix_args}} develop '.#pokedex.simulator.shell' -c cargo build
+  @nix {{nix_args}} develop '.#pokedex.simulator.shell' -c cargo build
