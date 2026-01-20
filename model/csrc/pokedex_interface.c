@@ -42,7 +42,7 @@ static struct pokedex_trace_buffer trace_buffer;
 ///////////////////////
 
 VirtMemReqInfo generate_vm_info(uint8_t access_type, uint32_t addr, uint8_t size) {
-    assert(("Internal Implemenattion error: access_type is not [0,2]", access_type < 3));
+    assert(access_type < 3 && "Internal Implementation error: access_type is not [0,2]");
 
     uint8_t priv = (uint8_t)privModeToBits_N_2_0(CURRENT_PRIVILEGE);
 
