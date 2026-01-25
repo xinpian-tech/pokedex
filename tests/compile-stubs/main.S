@@ -1,4 +1,5 @@
 // tohost address define in ld
+    .p2align 2
 _poweroff_spike:
     // override a0. Spike have special treatment for value at tohost address.
     li a0, 1
@@ -6,11 +7,13 @@ _poweroff_spike:
     ebreak
     ret
 
+    .p2align 2
 _poweroff_pokedex:
     sw a0, pokedex_mmio_exit, t5
     ret
 
 
+    .p2align 2
 _trap_handler:
     // exit with 4, common used for SIGILL
     li a0, 4
@@ -19,6 +22,7 @@ _trap_handler:
     j .
 
 
+    .p2align 2
 _poweroff:
     // exit with 0
     li a0, 0
