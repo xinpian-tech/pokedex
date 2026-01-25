@@ -67,7 +67,7 @@ impl Iterator for BitmapIndexIter32 {
 
 impl FusedIterator for BitmapIndexIter32 {}
 
-// TODO : use std::fmt::from_fn after stabalization, tracked at
+// TODO: use std::fmt::from_fn after stabilization, tracked at
 // https://github.com/rust-lang/rust/issues/117729
 
 pub fn from_fn<F: Fn(&mut std::fmt::Formatter<'_>) -> std::fmt::Result>(f: F) -> FromFn<F> {

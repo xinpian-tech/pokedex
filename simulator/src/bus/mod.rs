@@ -282,7 +282,7 @@ impl MMIOAddrDecoder {
 
 impl Addressable for MMIOAddrDecoder {
     fn do_bus_write(&mut self, offset: u32, data: &[u8]) -> Result<(), BusError> {
-        // a non u32 write is consider as implmentation bug and should be immediately bail out
+        // a non u32 write is consider as implementation bug and should be immediately bail out
         let new_val = u32::from_le_bytes(data.try_into().unwrap());
         let index = self.regs.binary_search_by(|(reg, _)| reg.cmp(&offset));
 
@@ -300,7 +300,7 @@ impl Addressable for MMIOAddrDecoder {
         let index = self.regs.binary_search_by(|(reg, _)| reg.cmp(&offset));
 
         if let Ok(i) = index {
-            // a non u32 read is consider as implmentation bug and should be immediately bail out
+            // a non u32 read is consider as implementation bug and should be immediately bail out
             dest.copy_from_slice(&self.regs[i].1.load().to_le_bytes());
 
             Ok(())

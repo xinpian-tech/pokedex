@@ -129,7 +129,8 @@ fn pretty_print_regs(
 fn pretty_print_csr(f: &mut std::fmt::Formatter<'_>, csr: &CsrState) -> std::fmt::Result {
     const COLUMN: usize = 4;
 
-    // FIXME: find a better way than hard-coding
+    // FIXME: The CSR list is hard-coded here and in CsrState struct.
+    // Consider using a macro or reflection to keep them in sync.
     let csr = [
         ("fcsr", csr.fcsr),
         ("vtype", csr.vtype),
@@ -203,7 +204,8 @@ pub fn pretty_print_diff(
         };
     }
 
-    // FIXME: find a better way than hard-coding
+    // FIXME: The CSR diff list is hard-coded here and must match CsrState fields.
+    // Consider using a macro or reflection to keep them in sync.
     diff_csr!(fcsr);
     diff_csr!(vtype);
     diff_csr!(vl);
@@ -269,7 +271,7 @@ impl CpuState {
 }
 
 impl CpuState {
-    /// Return an unintiallze CpuState. Reset and emulator alignment should be handled on software side.
+    /// Return an uninitialized CpuState. Reset and emulator alignment should be handled on software side.
     pub fn new() -> Self {
         Self {
             gpr: [0; 32],

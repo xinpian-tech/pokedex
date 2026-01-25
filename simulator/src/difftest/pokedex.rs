@@ -49,7 +49,7 @@ impl PokedexLogBackend {
     pub fn get_reset_pc(&self) -> u32 {
         match &self.logs[0] {
             &PokedexLog::Reset { pc } => pc,
-            _ => panic!("pokede json log should start with reset"),
+            _ => panic!("pokedex json log should start with reset"),
         }
     }
 }

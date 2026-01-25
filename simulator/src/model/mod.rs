@@ -1,5 +1,4 @@
 use std::{
-    collections::HashSet,
     ffi::{CStr, c_char, c_void},
     ptr::NonNull,
 };
@@ -49,6 +48,8 @@ impl Privileges {
     }
 }
 
+/// Model description for architecture introspection.
+#[allow(dead_code)]
 pub struct ModelDesc {
     pub privs: Privileges,
     pub xlen: u8,
