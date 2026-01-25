@@ -29,6 +29,14 @@ compile target:
   @just nix_args="{{nix_args}}" _compile-{{target}}
 
 
+[working-directory: 'tests']
+run-test *args:
+  #!/usr/bin/env -S nix develop {{nix_args}} '.#pokedex.{{cfg}}.tests.env' -c bash
+  set -euo pipefail
+  meson setup build $MESON_FLAGS --prefix $PWD/tests-output
+  meson test -C build {{args}}
+
+
 _build-model:
   @nix {{nix_args}} build '.#pokedex.{{cfg}}.model' -L --out-link result-model
   @echo "Result store in result-model/"

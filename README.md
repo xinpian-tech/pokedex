@@ -9,5 +9,7 @@ just compile model # Compile project locally for debug build
 just develop simulator # Entering development shell for simulator
 just cfg=zve32x compile model # Use zve32x.toml to debug compile the project
 just config_dir=path/to/other/config compile model # Use local configuration directory
+just run-test # Run test using default config
+just run-test rv32ua_amoadd_w # Run test match "rv32ua_amoadd_w" name
 just guidance #Compile the PDF
 ```
