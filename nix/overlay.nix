@@ -1,6 +1,12 @@
 { pokedex-configs-src }:
 
-final: prev: rec {
+final: prev:
+let
+  rv32Pkgs = final.pkgsCross.riscv32-embedded;
+  rv32BuildPkgs = rv32Pkgs.buildPackages;
+  rv32llvmPkgs = rv32BuildPkgs.llvmPackages;
+in
+rec {
   inherit pokedex-configs-src;
 
   pokedex = final.callPackage ../package.nix { };
@@ -11,53 +17,45 @@ final: prev: rec {
 
   riscv-vector-tests = final.callPackage ./pkgs/riscv-vector-tests.nix { };
 
-  rv32-llvm-compiler-rt = final.callPackage ./pkgs/rv32-llvm-compiler-rt.nix { };
+  rv32-llvm-compiler-rt = final.callPackage ./pkgs/rv32-llvm-compiler-rt.nix {
+    stdenv = rv32Pkgs.overrideCC rv32Pkgs.stdenv rv32BuildPkgs.llvmPackages.clangNoCompilerRt;
+  };
 
   berkeley-softfloat = final.callPackage ./pkgs/berkeley-softfloat.nix { };
 
-  rv32-stdenv =
-    let
-      rv32Pkgs = final.pkgsCross.riscv32-embedded;
-      rv32BuildPkgs = rv32Pkgs.buildPackages;
-      rv32llvmPkgs = rv32BuildPkgs.llvmPackages;
-    in
-    rv32Pkgs.stdenv.override {
-      cc =
-        let
-          major = final.lib.versions.major rv32llvmPkgs.release_version;
+  rv32-stdenv = rv32Pkgs.stdenv.override {
+    cc =
+      let
+        major = final.lib.versions.major rv32llvmPkgs.release_version;
 
-          # By default, compiler-rt and newlib for rv32 are built with double float point abi by default.
-          # We need to override it with `-mabi=ilp32f`
+        # By default, compiler-rt and newlib for rv32 are built with double float point abi by default.
+        # We need to override it with `-mabi=ilp32f`
 
-          # compiler-rt requires the compilation flag -fforce-enable-int128, only clang provides that
+        # compiler-rt requires the compilation flag -fforce-enable-int128, only clang provides that
 
-          newlib = rv32Pkgs.stdenv.cc.libc.overrideAttrs (oldAttrs: {
-            CFLAGS_FOR_TARGET = "-march=rv32imacf_zvl128b_zve32f -mabi=ilp32f";
-          });
-        in
-        rv32BuildPkgs.wrapCCWith rec {
-          cc = rv32llvmPkgs.clang-unwrapped;
-          libc = newlib;
-          bintools = rv32Pkgs.stdenv.cc.bintools.override {
-            inherit libc; # we must keep consistency of bintools libc and compiler libc
-            inherit (rv32llvmPkgs.bintools) bintools;
-          };
-
-          # common steps to produce clang resource directory
-          extraBuildCommands = ''
-            rsrc="$out/resource-root"
-            mkdir "$rsrc"
-            ln -s "${cc.lib}/lib/clang/${major}/include" "$rsrc"
-            echo "-resource-dir=$rsrc" >> $out/nix-support/cc-cflags
-            ln -s "${rv32-llvm-compiler-rt}/lib" "$rsrc/lib"
-            ln -s "${rv32-llvm-compiler-rt}/share" "$rsrc/share"
-          '';
-
-          # link against emurt
-          extraPackages = [ final.emurt ];
-          nixSupport.cc-cflags = [ "-lemurt" ];
+        newlib = rv32Pkgs.stdenv.cc.libc.overrideAttrs (oldAttrs: {
+          CFLAGS_FOR_TARGET = "-march=rv32imacf_zvl128b_zve32f -mabi=ilp32f";
+        });
+      in
+      rv32BuildPkgs.wrapCCWith rec {
+        cc = rv32llvmPkgs.clang-unwrapped;
+        libc = newlib;
+        bintools = rv32Pkgs.stdenv.cc.bintools.override {
+          inherit libc; # we must keep consistency of bintools libc and compiler libc
+          inherit (rv32llvmPkgs.bintools) bintools;
         };
-    };
+
+        # common steps to produce clang resource directory
+        extraBuildCommands = ''
+          rsrc="$out/resource-root"
+          mkdir "$rsrc"
+          ln -s "${cc.lib}/lib/clang/${major}/include" "$rsrc"
+          echo "-resource-dir=$rsrc" >> $out/nix-support/cc-cflags
+          ln -s "${rv32-llvm-compiler-rt}/lib" "$rsrc/lib"
+          ln -s "${rv32-llvm-compiler-rt}/share" "$rsrc/share"
+        '';
+      };
+  };
 
   riscv-opcodes-src = final.fetchFromGitHub {
     owner = "riscv";
