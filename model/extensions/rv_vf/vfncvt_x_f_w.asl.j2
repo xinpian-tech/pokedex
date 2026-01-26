@@ -1,0 +1,104 @@
+{%- macro vfncvt_fp2int_body(name, compute16) %}
+  if !isEnabled_VS() then
+    return IllegalInstruction();
+  end
+  if VTYPE.ill then
+    return IllegalInstruction();
+  end
+  if !IsZero(VSTART) then
+    return IllegalInstruction();
+  end
+
+  if !isEnabled_FS() then
+    return IllegalInstruction();
+  end
+  let (rm: RM, rm_valid: boolean) = getFrmDynamic();
+  if !rm_valid then
+    return IllegalInstruction();
+  end
+
+  let vd: VRegIdx = UInt(GetRD(instruction));
+  let vs2: VRegIdx = UInt(GetRS2(instruction));
+  let vm: bit = GetVM(instruction);
+
+  let vl: integer = VL;
+  let sew: integer{8, 16, 32, 64} = VTYPE.sew;
+  let vreg_align: integer{1, 2, 4, 8} = getAlign(VTYPE);
+  let (vreg_w_align: integer{1, 2, 4, 8}, valid: boolean) = getAlignWiden(VTYPE);
+
+  if sew >= 64 then
+    // 2*sew is too large
+    return IllegalInstruction();
+  end
+  if !valid then
+    // 2*lmul is too large
+    return IllegalInstruction();
+  end
+  if vm == '0' && vd == 0 then
+    // overlap with mask
+    return IllegalInstruction();
+  end
+  if vd MOD vreg_align != 0 then
+    // vd is not aligned with lmul group
+    return IllegalInstruction();
+  end
+  if vs2 MOD vreg_w_align != 0 then
+    // vs2 is not aligned with elmul group
+    return IllegalInstruction();
+  end
+  if vs2 < vd && vd < vs2 + vreg_w_align then
+    // vd is illegally overlapped with vs1
+    // NOTE: vd == vs2 is a case of legal overlap
+    return IllegalInstruction();
+  end
+
+  var fflags: bits(5) = Zeros(5);
+  case sew of
+    when 8 => begin
+      return IllegalInstruction();
+    end
+
+    when 16 => begin
+      for idx = 0 to vl - 1 do
+        if vm != '0' || V0_MASK[idx] then
+          let src2: bits(32) = VRF_32[vs2, idx];
+          let res: Bits16_Flags = {{compute16}};
+          VRF_16[vd, idx] = res.value;
+          fflags = fflags OR res.fflags;
+        end
+      end
+    end
+
+    when 32 => Todo("support sew=64");
+
+    otherwise => Unreachable();
+  end
+
+  logWrite_VREG_elmul(vd, vreg_align);
+
+  accureFFlags(fflags);
+  makeDirty_FS_VS();
+  clear_VSTART();
+  PC = PC + 4;
+  return Retired();
+{% endmacro -%}
+
+func Execute_VFNCVT_X_F_W(instruction: bits(32)) => Result
+begin
+{{- vfncvt_fp2int_body("vfncvt_x_f_w", compute16="riscv_f32_toSInt16(rm, src2)") -}}
+end
+
+func Execute_VFNCVT_XU_F_W(instruction: bits(32)) => Result
+begin
+{{- vfncvt_fp2int_body("vfncvt_xu_f_w", compute16="riscv_f32_toUInt16(rm, src2)") -}}
+end
+
+func Execute_VFNCVT_RTZ_X_F_W(instruction: bits(32)) => Result
+begin
+{{- vfncvt_fp2int_body("vfncvt_rtz_x_f_w", compute16="riscv_f32_toSInt16(RM_RTZ, src2)") -}}
+end
+
+func Execute_VFNCVT_RTZ_XU_F_W(instruction: bits(32)) => Result
+begin
+{{- vfncvt_fp2int_body("vfncvt_rtz_xu_f_w", compute16="riscv_f32_toUInt16(RM_RTZ, src2)") -}}
+end

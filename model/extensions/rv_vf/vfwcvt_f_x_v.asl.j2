@@ -1,0 +1,97 @@
+{#-
+  NOTE: the conversion is exact and never raises any FP flag.
+  NOTE: this instructions requires a valid FRM even if it's not used.
+-#}
+{%- macro vfwcvt_int2fp_body(name, op16) %}
+  if !isEnabled_VS() then
+    return IllegalInstruction();
+  end
+  if VTYPE.ill then
+    return IllegalInstruction();
+  end
+  if !IsZero(VSTART) then
+    return IllegalInstruction();
+  end
+
+  if !isEnabled_FS() then
+    return IllegalInstruction();
+  end
+  let (_rm: RM, rm_valid: boolean) = getFrmDynamic();
+  if !rm_valid then
+    return IllegalInstruction();
+  end
+
+  let vd: VRegIdx = UInt(GetRD(instruction));
+  let vs2: VRegIdx = UInt(GetRS2(instruction));
+  let vm: bit = GetVM(instruction);
+
+  let vl: integer = VL;
+  let sew: integer{8, 16, 32, 64} = VTYPE.sew;
+  let vreg_align: integer{1, 2, 4, 8} = getAlign(VTYPE);
+  let (vreg_w_align: integer{1, 2, 4, 8}, valid: boolean) = getAlignWiden(VTYPE);
+
+  if sew >= 64 then
+    // 2*sew is too large
+    return IllegalInstruction();
+  end
+
+  if vm == '0' && vd == 0 then
+    // overlap with mask
+    return IllegalInstruction();
+  end
+  if !valid then
+    // 2*lmul is too large
+    return IllegalInstruction();
+  end
+  if vd MOD vreg_w_align != 0 then
+    // vd is not aligned with 2*lmul group
+    return IllegalInstruction();
+  end
+  if vs2 MOD vreg_align != 0 then
+    // vs2 is not aligned with lmul group
+    return IllegalInstruction();
+  end
+
+  if vd == vs2 then
+    // vd is illegally overlapped with vs2
+    return IllegalInstruction();
+  end
+
+  case sew of
+    when 8 => begin
+      return IllegalInstruction();
+    end
+
+    when 16 => begin
+      for idx = 0 to vl - 1 do
+        if vm != '0' || V0_MASK[idx] then
+          let src2: bits(16) = VRF_16[vs2, idx];
+          let res: bits(32) = {{op16}}(src2);
+          VRF_32[vd, idx] = res;
+        end
+      end
+      return IllegalInstruction();
+    end
+
+    when 32 => Todo("support sew=64");
+
+    otherwise => Unreachable();
+  end
+
+  logWrite_VREG_elmul(vd, vreg_align);
+
+  makeDirty_VS();
+  clear_VSTART();
+  PC = PC + 4;
+  return Retired();
+{% endmacro -%}
+
+func Execute_VFWCVT_F_X_V(instruction: bits(32)) => Result
+begin
+{{- vfwcvt_int2fp_body("vfcvt_f_x_v", op16="f32_fromSInt16") -}}
+end
+
+func Execute_VFWCVT_F_XU_V(instruction: bits(32)) => Result
+begin
+{{- vfwcvt_int2fp_body("vfcvt_f_xu_v", op16="f32_fromUInt16") -}}
+end

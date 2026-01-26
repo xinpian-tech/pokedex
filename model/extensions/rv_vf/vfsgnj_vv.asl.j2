@@ -1,0 +1,102 @@
+{#-
+  inst vd, vs2, vs1, vm; vm mask is optional
+
+  eew(vd, vs2, vs1) = sew
+
+  NOTE: this instructions requires a valid FRM even if it's not used.
+
+  NOTE: it computes vd[i] = op(vs2[i], vs1[i])
+  the order of vs1/vs2 is swapped compared to ordinary riscv inst.
+-#}
+{%- macro vfop_vv_body(name, op) %}
+  if !isEnabled_VS() then
+    return IllegalInstruction();
+  end
+  if VTYPE.ill then
+    return IllegalInstruction();
+  end
+  if !IsZero(VSTART) then
+    return IllegalInstruction();
+  end
+
+  if !isEnabled_FS() then
+    return IllegalInstruction();
+  end
+  let (_rm: RM, rm_valid: boolean) = getFrmDynamic();
+  if !rm_valid then
+    return IllegalInstruction();
+  end
+
+  let vd: VRegIdx = UInt(GetRD(instruction));
+  let vs2: VRegIdx = UInt(GetRS2(instruction));
+  let vs1: VRegIdx = UInt(GetRS1(instruction));
+  let vm: bit = GetVM(instruction);
+
+  let vl: integer = VL;
+  let sew: integer{8, 16, 32, 64} = VTYPE.sew;
+  let vreg_align: integer{1, 2, 4, 8} = getAlign(VTYPE);
+
+  if vm == '0' && vd == 0 then
+    // overlap with mask
+    return IllegalInstruction();
+  end
+  if vd MOD vreg_align != 0 then
+    // vd is not aligned with lmul group
+    return IllegalInstruction();
+  end
+  if vs2 MOD vreg_align != 0 then
+    // vs2 is not aligned with elmul group
+    return IllegalInstruction();
+  end
+  if vs1 MOD vreg_align != 0 then
+    // vs1 is not aligned with elmul group
+    return IllegalInstruction();
+  end
+
+  case sew of
+    when 8 => begin
+      return IllegalInstruction();
+    end
+
+    when 16 => begin
+      return IllegalInstruction();
+    end
+
+    when 32 => begin
+      for idx = 0 to vl - 1 do
+        if vm != '0' || V0_MASK[idx] then
+          let src2: bits(32) = VRF_32[vs2, idx];
+          let src1: bits(32) = VRF_32[vs1, idx];
+          let res: bits(32) = {{ op }}(src2, src1);
+          VRF_32[vd, idx] = res;
+        end
+      end
+    end
+
+    when 64 => Todo("support sew=64");
+
+    otherwise => Unreachable();
+  end
+
+  logWrite_VREG_elmul(vd, vreg_align);
+
+  makeDirty_VS();
+  clear_VSTART();
+  PC = PC + 4;
+  return Retired();
+{% endmacro -%}
+
+func Execute_VFSGNJ_VV(instruction: bits(32)) => Result
+begin
+{{- vfop_vv_body("vfsgnj_vv", op="riscv_sgnj") -}}
+end
+
+func Execute_VFSGNJN_VV(instruction: bits(32)) => Result
+begin
+{{- vfop_vv_body("vfsgnjn_vv", op="riscv_sgnjn") -}}
+end
+
+func Execute_VFSGNJX_VV(instruction: bits(32)) => Result
+begin
+{{- vfop_vv_body("vfsgnjx_vv", op="riscv_sgnjx") -}}
+end

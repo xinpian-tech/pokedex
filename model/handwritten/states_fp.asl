@@ -80,6 +80,12 @@ begin
   end
 end
 
+func getFrmDynamic() => (RM, boolean)
+begin
+  let (rm, valid) = decodeFrmStatic(FRM);
+  return (rm, valid);
+end
+
 // accure fflags to FFLAGS 
 func accureFFlags(fflags: bits(5))
 begin
