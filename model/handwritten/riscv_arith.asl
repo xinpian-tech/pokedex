@@ -88,6 +88,27 @@ begin
   end
 end
 
+///////////////////////
+// FP sign injection //
+///////////////////////
+
+// copy the sign of y to x, e.g. fsgnj.s
+func riscv_sgnj{N}(x: bits(N), y: bits(N)) => bits(N)
+begin
+  return [y[N-1], x[N-2:0]];
+end
+
+// copy the opposite sign of y to x, e.g. fsgnjn.s
+func riscv_sgnjn{N}(x: bits(N), y: bits(N)) => bits(N)
+begin
+  return [NOT y[N-1], x[N-2:0]];
+end
+
+// xor the sign of y to x, e.g. fsgnjx.s
+func riscv_sgnjx{N}(x: bits(N), y: bits(N)) => bits(N)
+begin
+  return [y[N-1] XOR x[N-1], x[N-2:0]];
+end
 
 //////////////////////
 // shift operations //
