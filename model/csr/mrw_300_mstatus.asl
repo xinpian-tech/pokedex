@@ -109,3 +109,11 @@ func makeDirty_VS() begin
   // TODO : track fine-grained
   logWrite_MSTATUS();
 end
+
+func makeDirty_FS_VS() begin
+  MSTATUS_FS = '11';
+  MSTATUS_VS = '11';
+
+  // TODO : track fine-grained
+  logWrite_MSTATUS();
+end

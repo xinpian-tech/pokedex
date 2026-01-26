@@ -48,7 +48,7 @@ func riscv_f32_mulAdd(frm: RM, x: bits(32), y: bits(32), z: bits(32)) => F32_Fla
 // NOTE: this function is implemented in softfloat_wrapper.c
 func riscv_f32_ltSignaling(x: bits(32), y: bits(32)) => Bool_Flags;
 
-// IEEE 754-2019: "compareSignalingLessThan" operation
+// IEEE 754-2019: "compareSignalingLessEqual" operation
 // NOTE: this function is implemented in softfloat_wrapper.c
 func riscv_f32_leSignaling(x: bits(32), y: bits(32)) => Bool_Flags;
 
@@ -56,7 +56,34 @@ func riscv_f32_leSignaling(x: bits(32), y: bits(32)) => Bool_Flags;
 // NOTE: this function is implemented in softfloat_wrapper.c
 func riscv_f32_eqQuiet(x: bits(32), y: bits(32)) => Bool_Flags;
 
+// IEEE 754-2019: "compareQuietNotEqual" operation
+func riscv_f32_neqQuiet(x: bits(32), y: bits(32)) => Bool_Flags
+begin
+  let res = riscv_f32_eqQuiet(x, y);
+  return Bool_Flags {
+    value = !res.value,
+    fflags = res.fflags
+  };
+end
+
+// IEEE 754-2019: "compareSignalingGreater" operation
+func riscv_f32_gtSignaling(x: bits(32), y: bits(32)) => Bool_Flags
+begin
+  return riscv_f32_ltSignaling(y, x);
+end
+
+// IEEE 754-2019: "compareSignalingGreaterEqual" operation
+func riscv_f32_geSignaling(x: bits(32), y: bits(32)) => Bool_Flags
+begin
+  return riscv_f32_leSignaling(y, x);
+end
+
+// IEEE 754-2019: "compareSignalingGreaterEqual" operation
+// NOTE: this function is implemented in softfloat_wrapper.c
 func riscv_f32_fromSInt32(frm: RM, x: bits(32)) => F32_Flags;
+
+// IEEE 754-2019: "compareSignalingGreaterEqual" operation
+// NOTE: this function is implemented in softfloat_wrapper.c
 func riscv_f32_fromUInt32(frm: RM, x: bits(32)) => F32_Flags;
 
 // IEEE 754-2019: "convertToIntegerExact" operation family
@@ -72,6 +99,18 @@ func riscv_f32_toSInt32(frm: RM, x: bits(32)) => Bits32_Flags;
 // - RISC-V requires the result is (2^32-1) if the input is NaN
 // NOTE: this function is implemented in softfloat_wrapper.c
 func riscv_f32_toUInt32(frm: RM, x: bits(32)) => Bits32_Flags;
+
+// This function is used in vfrsub.vf
+func riscv_f32_rsub(frm: RM, x: bits(32), y: bits(32)) => F32_Flags
+begin
+  return riscv_f32_sub(frm, y, x);
+end
+
+// This function is used in vfrdiv.vf
+func riscv_f32_rdiv(frm: RM, x: bits(32), y: bits(32)) => F32_Flags
+begin
+  return riscv_f32_div(frm, y, x);
+end
 
 func riscv_f32_mulAddGeneric(frm: RM, x: bits(32), y: bits(32), z: bits(32), inv_prod: boolean, inv_rs3: boolean) => F32_Flags
 begin
