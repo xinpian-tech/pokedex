@@ -11,7 +11,7 @@ begin
 
   let current_pc = PC;
 
-  let least_significant_half : FFI_ReadResult(16) = FFI_instruction_fetch_half(current_pc);
+  let least_significant_half = InstructionFetch(current_pc);
   if !least_significant_half.success then
     FFI_debug_print("instruction fetch LSH fail");
     handleException(
@@ -30,7 +30,7 @@ begin
   
   if least_significant_half.data[1:0] == '11' then
     // execute non-compressed instruction
-    let most_significant_half : FFI_ReadResult(16) = FFI_instruction_fetch_half(current_pc + 2);
+    let most_significant_half = InstructionFetch(current_pc + 2);
     if !most_significant_half.success then
       FFI_debug_print("instruction fetch MSH fail");
       handleException(

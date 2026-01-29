@@ -21,12 +21,6 @@ record VirtAddrTransResult {
   status : VirtAddrTransState;
 };
 
-enumeration AccessType {
-  AT_Fetch,
-  AT_Load,
-  AT_Store,
-};
-
 func Translate(addr : bits(32), access_type : AccessType) => VirtAddrTransResult
 begin
   // Address in M mode are all physical address
