@@ -40,6 +40,24 @@ static struct pokedex_trace_buffer trace_buffer;
 // callback wrappers //
 ///////////////////////
 
+FFI_TLBResult FFI_req_tlb_query(unsigned _BitInt(20) vpn, unsigned _BitInt(9) asid) {
+    uint8_t perm = 0;
+    uint32_t ppn = 0;
+
+    uint32_t tag_vpn = (uint32_t)vpn;
+    uint16_t tag_asid = (uint16_t)asid;
+
+    bool hit = mem_cb_vtable->req_tlb_query(tag_vpn/*input_vpn*/, tag_asid/*input_asid*/, &perm/*output_perm*/, &ppn/*output_ppn*/);
+    assert(ppn <= 0xFFFFF);
+    unsigned _BitInt(20) ppn_bits = ppn;
+
+    FFI_TLBResult result = {
+        .hit = hit,
+        .ppn = ppn_bits,
+        .perm = perm,
+    };
+    return result;
+}
 
 
 FFI_ReadResult_N_16 FFI_instruction_fetch_half_0(uint32_t pc) {

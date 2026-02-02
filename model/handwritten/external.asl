@@ -95,3 +95,8 @@ end
 // defined in step.asl
 // func Step() => FFI_StepResult
 //
+
+record FFI_TLBResult {
+  hit : boolean;
+  ppn : ppn;
+}

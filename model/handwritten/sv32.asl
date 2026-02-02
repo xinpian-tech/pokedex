@@ -4,7 +4,7 @@ constant SV32_PAGE_SIZE : integer{4096} = 4096;
 constant SV32_MAX_LVL : integer{2} = 2;
 constant SV32_PTE_SIZE : integer{4} = 4;
 
-func Sv32Walk(addr : bits(32)) => bits(32)
+func Sv32(addr : bits(32)) => bits(32)
 begin
   
 end
@@ -39,6 +39,23 @@ begin
     };
   end
 
+  let tlb_result = FFI_tlb_search(addr[31:12], SATP_ASID);
+  if tlb_result.hit then
+    if !_Sv32CheckPerm(tlb_result.perm, access_type) then
+      return PageFault();
+    end
+
+    return PhysicalAddress(tlb_result);
+  end
+
+  let result = _Sv32PTW(addr, access_type);
+  FFI_tlb_fill(result);
+
+  return PhysicalAddress(result);
+end
+
+func _Sv32PTW(addr : bits(32), access_type : AccessType) => VirtAddrTransResult
+begin
   constant vpn0_lo : integer{12} = 12;
   constant vpn_len : integer{10} = 10;
   var a = UInt(SATP_PPN) * SV32_PAGE_SIZE;
