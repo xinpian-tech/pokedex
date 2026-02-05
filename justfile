@@ -1,4 +1,4 @@
-cfg := "full"
+cfg := "zve32f"
 config_dir := ""
 nix_args := if config_dir != "" { f"--override-input pokedex-configs-src path:{{canonicalize(config_dir)}}" } else { "" }
 
@@ -33,8 +33,8 @@ compile target:
 run-test *args:
   #!/usr/bin/env -S nix develop {{nix_args}} '.#pokedex.{{cfg}}.tests.env' -c bash
   set -euo pipefail
-  meson setup build $MESON_FLAGS --prefix $PWD/tests-output
-  meson test -C build {{args}}
+  meson setup build_{{cfg}} $MESON_FLAGS --prefix $PWD/tests-output
+  meson test -C build_{{cfg}} {{args}}
 
 
 _build-model:
