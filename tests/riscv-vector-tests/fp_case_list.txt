@@ -1,0 +1,72 @@
+vfadd.vf
+vfadd.vv
+vfsub.vf
+vfsub.vv
+vfrsub.vf
+vfmul.vf
+vfmul.vv
+vfdiv.vf
+vfdiv.vv
+vfrdiv.vf
+vfmin.vf
+vfmin.vv
+vfmax.vf
+vfmax.vv
+vfsgnj.vf
+vfsgnj.vv
+vfsgnjn.vf
+vfsgnjn.vv
+vfsgnjx.vf
+vfsgnjx.vv
+vmfeq.vf
+vmfeq.vv
+vmfge.vf
+vmfgt.vf
+vmfle.vf
+vmfle.vv
+vmflt.vf
+vmflt.vv
+vmfne.vf
+vmfne.vv
+vfclass.v
+vfsqrt.v
+vfslide1down.vf
+vfslide1up.vf
+vfmerge.vfm
+vfmv.f.s
+vfmv.s.f
+vfmv.v.f
+vfmacc.vf
+vfmacc.vv
+vfmadd.vf
+vfmadd.vv
+vfmsac.vf
+vfmsac.vv
+vfmsub.vf
+vfmsub.vv
+vfnmacc.vf
+vfnmacc.vv
+vfnmadd.vf
+vfnmadd.vv
+vfnmsac.vf
+vfnmsac.vv
+vfnmsub.vf
+vfnmsub.vv
+vfrec7.v
+vfrsqrt7.v
+vfredmax.vs
+vfredmin.vs
+vfredosum.vs
+vfredusum.vs
+vfcvt.f.x.v
+vfcvt.f.xu.v
+vfcvt.x.f.v
+vfcvt.xu.f.v
+vfcvt.rtz.x.f.v
+vfcvt.rtz.xu.f.v
+# vfwcvt.f.x.v
+# vfwcvt.f.xu.v
+# vfncvt.x.f.w
+# vfncvt.xu.f.w
+# vfncvt.rtz.x.f.w
+# vfncvt.rtz.xu.f.w

@@ -73,9 +73,9 @@
     end
 
     logWrite_VREG_1(vd);
+    makeDirty_VS();
   end
 
-  makeDirty_VS();
   clear_VSTART();
   PC = PC + 4;
   return Retired();

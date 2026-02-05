@@ -1,0 +1,126 @@
+{#-
+  inst vd, vs1, vs2, vm; vm mask is optional
+
+  eew(vd, vs1, vs2) = sew
+-#}
+{%- macro vfmop_vv_body(name, compute32) %}
+  if !isEnabled_VS() then
+    return IllegalInstruction();
+  end
+  if VTYPE.ill then
+    return IllegalInstruction();
+  end
+  if !IsZero(VSTART) then
+    return IllegalInstruction();
+  end
+
+  if !isEnabled_FS() then
+    return IllegalInstruction();
+  end
+  let (rm: RM, rm_valid: boolean) = getFrmDynamic();
+  if !rm_valid then
+    return IllegalInstruction();
+  end
+
+  let vd: VRegIdx = UInt(GetRD(instruction));
+  let vs2: VRegIdx = UInt(GetRS2(instruction));
+  let vs1: VRegIdx = UInt(GetRS1(instruction));
+  let vm: bit = GetVM(instruction);
+
+  let vl: integer = VL;
+  let sew: integer{8, 16, 32, 64} = VTYPE.sew;
+  let vreg_align: integer{1, 2, 4, 8} = getAlign(VTYPE);
+
+  if vm == '0' && vd == 0 then
+    // overlap with mask
+    return IllegalInstruction();
+  end
+  if vd MOD vreg_align != 0 then
+    // vd is not aligned with lmul group
+    return IllegalInstruction();
+  end
+  if vs2 MOD vreg_align != 0 then
+    // vs2 is not aligned with elmul group
+    return IllegalInstruction();
+  end
+  if vs1 MOD vreg_align != 0 then
+    // vs2 is not aligned with elmul group
+    return IllegalInstruction();
+  end
+
+  var fflags: bits(5) = Zeros(5);
+  case sew of
+    when 8 => begin
+      return IllegalInstruction();
+    end
+
+    when 16 => begin
+      return IllegalInstruction();
+    end
+
+    when 32 => begin
+      for idx = 0 to vl - 1 do
+        if vm != '0' || V0_MASK[idx] then
+          let srcd: bits(32) = VRF_32[vd, idx];
+          let src2: bits(32) = VRF_32[vs2, idx];
+          let src1: bits(32) = VRF_32[vs1, idx];
+          let res: F32_Flags = {{compute32}};
+          VRF_32[vd, idx] = res.value;
+          fflags = fflags OR res.fflags;
+        end
+      end
+    end
+
+    when 64 => Todo("support sew=64");
+
+    otherwise => Unreachable();
+  end
+
+  logWrite_VREG_elmul(vd, vreg_align);
+
+  accureFFlags(fflags);
+  makeDirty_FS_VS();
+  clear_VSTART();
+  PC = PC + 4;
+  return Retired();
+{% endmacro -%}
+
+func Execute_VFMACC_VV(instruction: bits(32)) => Result
+begin
+{{- vfmop_vv_body("vfmacc_vv", "riscv_f32_mulAddGeneric(rm, src1, src2, srcd, FALSE, FALSE)") -}}
+end
+
+func Execute_VFMSAC_VV(instruction: bits(32)) => Result
+begin
+{{- vfmop_vv_body("vfmsac_vv", "riscv_f32_mulAddGeneric(rm, src1, src2, srcd, FALSE, TRUE)") -}}
+end
+
+func Execute_VFNMSAC_VV(instruction: bits(32)) => Result
+begin
+{{- vfmop_vv_body("vfnmsac_vv", "riscv_f32_mulAddGeneric(rm, src1, src2, srcd, TRUE, FALSE)") -}}
+end
+
+func Execute_VFNMACC_VV(instruction: bits(32)) => Result
+begin
+{{- vfmop_vv_body("vfnmacc_vv", "riscv_f32_mulAddGeneric(rm, src1, src2, srcd, TRUE, TRUE)") -}}
+end
+
+func Execute_VFMADD_VV(instruction: bits(32)) => Result
+begin
+{{- vfmop_vv_body("vfmadd_vv", "riscv_f32_mulAddGeneric(rm, src1, srcd, src2, FALSE, FALSE)") -}}
+end
+
+func Execute_VFMSUB_VV(instruction: bits(32)) => Result
+begin
+{{- vfmop_vv_body("vfmsub_vv", "riscv_f32_mulAddGeneric(rm, src1, srcd, src2, FALSE, TRUE)") -}}
+end
+
+func Execute_VFNMSUB_VV(instruction: bits(32)) => Result
+begin
+{{- vfmop_vv_body("vfnmsub_vv", "riscv_f32_mulAddGeneric(rm, src1, srcd, src2, TRUE, FALSE)") -}}
+end
+
+func Execute_VFNMADD_VV(instruction: bits(32)) => Result
+begin
+{{- vfmop_vv_body("vfnmadd_vv", "riscv_f32_mulAddGeneric(rm, src1, srcd, src2, TRUE, TRUE)") -}}
+end

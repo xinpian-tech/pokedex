@@ -174,21 +174,50 @@ impl Tracer for NoopTracer {
 
 pub struct StdoutTracer;
 
-impl StdoutTracer {
-    pub const NEW: StdoutTracer = StdoutTracer;
-}
-
 impl Tracer for StdoutTracer {
-    fn trace_reset(&mut self, _pc: u32) {
-        todo!()
+    fn trace_reset(&mut self, pc: u32) {
+        println!("[RESET] pc={pc:#010x}");
     }
 
-    fn trace_exit(&mut self, _exit_code: u32) {
-        todo!()
+    fn trace_exit(&mut self, exit_code: u32) {
+        println!("[EXIT]  code={exit_code}");
     }
 
-    fn trace_step(&mut self, _detail: StepDetail) {
-        todo!()
+    fn trace_step(&mut self, detail: StepDetail) {
+        let Some(inst) = detail.inst else {
+            assert!(detail.changes.is_empty_changes());
+            return;
+        };
+
+        print!("[INST]  pc={:#010x}", detail.pc);
+
+        match inst {
+            Inst::NC(i) => print!(" inst={i:#010x}"),
+            Inst::C(i) => print!(" inst={i:#06x}"),
+        };
+
+        // Print register changes
+        for (rd, value) in detail.changes.xreg_changes() {
+            print!(" x{rd}<-{value:#010x}");
+        }
+        for (rd, value) in detail.changes.freg_changes() {
+            print!(" f{rd}<-{value:#010x}");
+        }
+        for rd in detail.changes.vreg_change_indices() {
+            let mut value = vec![0u8; 32];
+            detail.changes.core.read_vreg(rd, &mut value);
+            print!(" v{rd}<-0x");
+            for byte in value.iter().rev() {
+                print!("{byte:02x}");
+            }
+        }
+        for csr in detail.changes.csr_change_indices() {
+            let value = detail.changes.core.read_csr(csr);
+            let name = name_of_csr(csr);
+            print!(" {name}<-{value:#010x}");
+        }
+
+        println!();
     }
 
     fn flush(&mut self) {}

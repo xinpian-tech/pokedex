@@ -1,4 +1,4 @@
-{%- macro fsign_body(name, compute_sign) %}
+{%- macro fsign_body(name, op) %}
   if !isEnabled_FS() then
     return IllegalInstruction();
   end
@@ -10,8 +10,7 @@
   var src1 : bits(32) = F[fs1];
   var src2 : bits(32) = F[fs2];
 
-  var res : bits(32) = src1;
-  res[31] = {{ compute_sign }};
+  var res : bits(32) = {{ op }}(src1, src2);
 
   F[fd] = res;
 
@@ -22,15 +21,15 @@
 
 func Execute_FSGNJ_S(instruction: bits(32)) => Result
 begin
-{{- fsign_body("fsgnj_s", "src2[31]") -}}
+{{- fsign_body("fsgnj_s", "riscv_sgnj") -}}
 end
 
 func Execute_FSGNJN_S(instruction: bits(32)) => Result
 begin
-{{- fsign_body("fsgnjn_s", "NOT src2[31]") -}}
+{{- fsign_body("fsgnjn_s", "riscv_sgnjn") -}}
 end
 
 func Execute_FSGNJX_S(instruction: bits(32)) => Result
 begin
-{{- fsign_body("fsgnjx_s", "src1[31] XOR src2[31]") -}}
+{{- fsign_body("fsgnjx_s", "riscv_sgnjx") -}}
 end

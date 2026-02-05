@@ -13,6 +13,11 @@ type Bits32_Flags of record {
   fflags: bits(5)
 };
 
+type Bits16_Flags of record {
+  value: bits(16),
+  fflags: bits(5)
+};
+
 // RISC-V floating-point operations does not perform NaN propagation.
 // When an arithmetic operation generates a NaN,
 // it always generates the (quiet) RSIC-V canonical NaN.
@@ -48,7 +53,7 @@ func riscv_f32_mulAdd(frm: RM, x: bits(32), y: bits(32), z: bits(32)) => F32_Fla
 // NOTE: this function is implemented in softfloat_wrapper.c
 func riscv_f32_ltSignaling(x: bits(32), y: bits(32)) => Bool_Flags;
 
-// IEEE 754-2019: "compareSignalingLessThan" operation
+// IEEE 754-2019: "compareSignalingLessEqual" operation
 // NOTE: this function is implemented in softfloat_wrapper.c
 func riscv_f32_leSignaling(x: bits(32), y: bits(32)) => Bool_Flags;
 
@@ -56,7 +61,34 @@ func riscv_f32_leSignaling(x: bits(32), y: bits(32)) => Bool_Flags;
 // NOTE: this function is implemented in softfloat_wrapper.c
 func riscv_f32_eqQuiet(x: bits(32), y: bits(32)) => Bool_Flags;
 
+// IEEE 754-2019: "compareQuietNotEqual" operation
+func riscv_f32_neqQuiet(x: bits(32), y: bits(32)) => Bool_Flags
+begin
+  let res = riscv_f32_eqQuiet(x, y);
+  return Bool_Flags {
+    value = !res.value,
+    fflags = res.fflags
+  };
+end
+
+// IEEE 754-2019: "compareSignalingGreater" operation
+func riscv_f32_gtSignaling(x: bits(32), y: bits(32)) => Bool_Flags
+begin
+  return riscv_f32_ltSignaling(y, x);
+end
+
+// IEEE 754-2019: "compareSignalingGreaterEqual" operation
+func riscv_f32_geSignaling(x: bits(32), y: bits(32)) => Bool_Flags
+begin
+  return riscv_f32_leSignaling(y, x);
+end
+
+// IEEE 754-2019: "compareSignalingGreaterEqual" operation
+// NOTE: this function is implemented in softfloat_wrapper.c
 func riscv_f32_fromSInt32(frm: RM, x: bits(32)) => F32_Flags;
+
+// IEEE 754-2019: "compareSignalingGreaterEqual" operation
+// NOTE: this function is implemented in softfloat_wrapper.c
 func riscv_f32_fromUInt32(frm: RM, x: bits(32)) => F32_Flags;
 
 // IEEE 754-2019: "convertToIntegerExact" operation family
@@ -72,6 +104,28 @@ func riscv_f32_toSInt32(frm: RM, x: bits(32)) => Bits32_Flags;
 // - RISC-V requires the result is (2^32-1) if the input is NaN
 // NOTE: this function is implemented in softfloat_wrapper.c
 func riscv_f32_toUInt32(frm: RM, x: bits(32)) => Bits32_Flags;
+
+// This function is used in vfrsub.vf
+func riscv_f32_rsub(frm: RM, x: bits(32), y: bits(32)) => F32_Flags
+begin
+  return riscv_f32_sub(frm, y, x);
+end
+
+// This function is used in vfrdiv.vf
+func riscv_f32_rdiv(frm: RM, x: bits(32), y: bits(32)) => F32_Flags
+begin
+  return riscv_f32_div(frm, y, x);
+end
+
+// This function is used in vfrec7.v
+// NOTE: the behavior is aligned with Spike
+// NOTE: this function is implemented in softfloat_wrapper.c
+func riscv_f32_rec7(frm: RM, x: bits(32)) => F32_Flags;
+
+// This function is used in vfrsqrt7.v
+// NOTE: the behavior is aligned with Spike
+// NOTE: this function is implemented in softfloat_wrapper.c
+func riscv_f32_rsqrt7(frm: RM, x: bits(32)) => F32_Flags;
 
 func riscv_f32_mulAddGeneric(frm: RM, x: bits(32), y: bits(32), z: bits(32), inv_prod: boolean, inv_rs3: boolean) => F32_Flags
 begin
@@ -242,4 +296,87 @@ begin
 
   assert(!IsZero(mask));
   return mask;
+end
+
+// The result is guranteed to be exact
+func f32_fromSmallInt(sign: bit, value: bits(24)) => bits(32)
+begin
+  if IsZero(value) then
+    return [sign, Zeros(31)];
+  end
+
+  var exp: bits(8) = (127+23)[7:0];
+  var sig: bits(24) = value;
+  while value[23] != '1' do
+    exp = exp - 1;
+    sig = ShiftLeft(sig, 1);
+  end
+
+  return [sign, exp, sig[22:0]];
+end
+
+// The result is guranteed to be exact
+func f32_fromSInt16(x: bits(16)) => bits(32)
+begin
+  if x[15] == '1' then
+    // negative
+    return f32_fromSmallInt('1', (-SInt(x))[23:0]);
+  else
+    // positive or zero
+    return f32_fromSmallInt('0', ZeroExtend(x, 24));
+  end
+end
+
+// The result is guranteed to be exact
+func f32_fromUInt16(x: bits(16)) => bits(32)
+begin
+  return f32_fromSmallInt('0', ZeroExtend(x, 24));
+end
+
+// IEEE 754-2019: "convertToIntegerExact" operation family
+// - RISC-V requires the result saturated when the result is out of bound,
+//   including the case that the input is +- inf.
+// - RISC-V requires the result is (2^15-1) if the input is NaN
+func riscv_f32_toSInt16(frm: RM, x: bits(32)) => Bits16_Flags
+begin
+  let res: Bits32_Flags = riscv_f32_toSInt32(frm, x);
+  if SInt(res.value) >= 32768 then
+    // overflow or x is NaN
+    return Bits16_Flags {
+      value = ['0', Ones(15)],
+      fflags = '10000' // raise invalid flag
+    };
+  elsif SInt(res.value) < -32768 then
+    // underflow
+    return Bits16_Flags {
+      value = ['1', Zeros(15)],
+      fflags = '10000' // raise invalid flag
+    };
+  else
+    return Bits16_Flags {
+      value = res.value[15:0],
+      fflags = res.fflags
+    };
+  end
+end
+
+// IEEE 754-2019: "convertToIntegerExact" operation family
+// - RISC-V requires the result saturated when the result is out of bound,
+//   including the case that the input is +- inf.
+// - RISC-V requires the result is (2^16-1) if the input is NaN
+func riscv_f32_toUInt16(frm: RM, x: bits(32)) => Bits16_Flags
+begin
+  let res: Bits32_Flags = riscv_f32_toUInt32(frm, x);
+  if UInt(res.value[31:16]) >= 65536 then
+    // overflow or x is NaN
+    return Bits16_Flags {
+      value = Ones(16),
+      fflags = '10000'  // raise invalid flag
+    };
+  else
+    return Bits16_Flags {
+      value = res.value[15:0],
+      fflags = res.fflags
+    };
+  end
 end
