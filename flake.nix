@@ -74,6 +74,11 @@
               # unlike 'cargo fmt' which reads from Cargo.toml.
               #
               # rustfmt.enable = true;
+
+              black.excludes = [
+                # ninja_syntax.py is vendored from upstream verbatimly
+                "model/scripts/ninja_syntax.py"
+              ];
             };
           };
         };
