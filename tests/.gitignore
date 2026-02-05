@@ -1,2 +1,4 @@
 tests-output/
 test_bins/
+/build
+/build_*
