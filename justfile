@@ -10,7 +10,7 @@ _default:
 # Build PDF guidance
 guidance:
   @echo "Compiling Document"
-  @nix {{nix_args}} build '.#pokdex.{{cfg}}.docs.guidance'
+  nix build {{nix_args}} '.#pokedex.{{cfg}}.docs.guidance'
   @echo "File store in ./result/doc.pdf"
 
 # Build Targets: model, simulator
@@ -38,26 +38,26 @@ run-test *args:
 
 
 _build-model:
-  @nix {{nix_args}} build '.#pokedex.{{cfg}}.model' -L --out-link result-model
+  @nix build {{nix_args}} '.#pokedex.{{cfg}}.model-asl' -L --out-link result-model
   @echo "Result store in result-model/"
 
 _build-simulator:
-  @nix {{nix_args}} build '.#pokedex.simulator' -L --out-link result-simulator
+  @nix build {{nix_args}} '.#pokedex.simulator' -L --out-link result-simulator
   @echo "Result store in result-simulator/"
 
 
-[working-directory: 'model']
+[working-directory: 'model-asl']
 _develop-model:
-  @nix {{nix_args}} develop '.#pokedex.{{cfg}}.model'
+  @nix develop {{nix_args}} '.#pokedex.{{cfg}}.model-asl'
 
 [working-directory: 'simulator']
 _develop-simulator:
-  @nix {{nix_args}} develop '.#pokedex.simulator.shell'
+  @nix develop {{nix_args}} '.#pokedex.simulator.shell'
 
 
-[working-directory: 'model']
+[working-directory: 'model-asl']
 _compile-model:
-  #!/usr/bin/env -S nix develop {{nix_args}} '.#pokedex.{{cfg}}.model' -c bash
+  #!/usr/bin/env -S nix develop {{nix_args}} '.#pokedex.{{cfg}}.model-asl' -c bash
   set -euo pipefail
   echo
   echo "Debug compiling ASL model with config {{BG_BLUE}}{{BOLD}}{{cfg}}{{NORMAL}}"
@@ -69,4 +69,4 @@ _compile-model:
 [working-directory: 'simulator']
 _compile-simulator:
   @echo "Debug compiling simulator"
-  @nix {{nix_args}} develop '.#pokedex.simulator.shell' -c cargo build
+  @nix develop {{nix_args}} '.#pokedex.simulator.shell' -c cargo build

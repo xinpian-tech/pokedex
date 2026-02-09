@@ -43,7 +43,7 @@ lib.makeScope newScope (
         src = configsPath;
       };
 
-      model = scope.callPackage ./model/package.nix { };
+      model-asl = scope.callPackage ./model_asl/package.nix { };
 
       tests = scope.callPackage ./tests { };
       docs = scope.callPackage ./docs/package.nix { };

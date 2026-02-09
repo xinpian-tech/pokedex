@@ -7,12 +7,13 @@
   ninja,
   spike,
   dtc,
-  model,
+  model-asl,
   simulator,
   python3,
   prebuilt-cases,
 }:
 let
+  model = model-asl;
   inherit (pokedex-configs.profile)
     march
     vlen

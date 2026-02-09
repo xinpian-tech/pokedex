@@ -1,6 +1,6 @@
 {
   mkTypstEnv,
-  model,
+  model-asl,
 }:
 mkTypstEnv {
   name = "pokedex-guidance";
@@ -35,7 +35,7 @@ mkTypstEnv {
   ];
 
   typstPhase = ''
-    cp -v ${model}/docs/*.yml .
+    cp -v ${model-asl}/docs/*.yml .
     # Normal
     typst compile --input release=true main.typ doc.pdf
     # Darkmode
