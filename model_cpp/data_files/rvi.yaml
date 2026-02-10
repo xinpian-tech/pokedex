@@ -1,0 +1,228 @@
+I:
+  conditions: []
+  instructions:
+    # U-type
+    - name: lui
+      encoding: "-------------------------0110111"
+    - name: auipc
+      encoding: "-------------------------0010111"
+
+    # J-type
+    - name: jal
+      encoding: "-------------------------1101111"
+
+    # I-type (JALR)
+    - name: jalr
+      encoding: "-----------------000-----1100111"
+
+    # B-type
+    - name: beq
+      encoding: "-----------------000-----1100011"
+    - name: bne
+      encoding: "-----------------001-----1100011"
+    - name: blt
+      encoding: "-----------------100-----1100011"
+    - name: bge
+      encoding: "-----------------101-----1100011"
+    - name: bltu
+      encoding: "-----------------110-----1100011"
+    - name: bgeu
+      encoding: "-----------------111-----1100011"
+
+    # Loads (I-type)
+    - name: lb
+      encoding: "-----------------000-----0000011"
+    - name: lh
+      encoding: "-----------------001-----0000011"
+    - name: lw
+      encoding: "-----------------010-----0000011"
+    - name: lbu
+      encoding: "-----------------100-----0000011"
+    - name: lhu
+      encoding: "-----------------101-----0000011"
+
+    # Stores (S-type)
+    - name: sb
+      encoding: "-----------------000-----0100011"
+    - name: sh
+      encoding: "-----------------001-----0100011"
+    - name: sw
+      encoding: "-----------------010-----0100011"
+
+    # I-type ALU
+    - name: addi
+      encoding: "-----------------000-----0010011"
+    - name: slti
+      encoding: "-----------------010-----0010011"
+    - name: sltiu
+      encoding: "-----------------011-----0010011"
+    - name: xori
+      encoding: "-----------------100-----0010011"
+    - name: ori
+      encoding: "-----------------110-----0010011"
+    - name: andi
+      encoding: "-----------------111-----0010011"
+
+    # R-type ALU
+    - name: add
+      encoding: "0000000----------000-----0110011"
+    - name: sub
+      encoding: "0100000----------000-----0110011"
+    - name: sll
+      encoding: "0000000----------001-----0110011"
+    - name: slt
+      encoding: "0000000----------010-----0110011"
+    - name: sltu
+      encoding: "0000000----------011-----0110011"
+    - name: xor
+      encoding: "0000000----------100-----0110011"
+    - name: srl
+      encoding: "0000000----------101-----0110011"
+    - name: sra
+      encoding: "0100000----------101-----0110011"
+    - name: or
+      encoding: "0000000----------110-----0110011"
+    - name: and
+      encoding: "0000000----------111-----0110011"
+
+I_rv32:
+  conditions: ["rv32"]
+  instructions:
+    # Shifts with 5-bit shamt (funct7 fully specified)
+    - name: slli
+      encoding: "0000000----------001-----0010011"
+    - name: srli
+      encoding: "0000000----------101-----0010011"
+    - name: srai
+      encoding: "0100000----------101-----0010011"
+
+I_rv64:
+  conditions: ["rv64"]
+  instructions:
+    # RV64 Loads/Stores
+    - name: lwu
+      encoding: "-----------------110-----0000011"
+    - name: ld
+      encoding: "-----------------011-----0000011"
+    - name: sd
+      encoding: "-----------------011-----0100011"
+
+    # I-type ALU word ops
+    - name: addiw
+      encoding: "-----------------000-----0011011"
+
+    # Shifts with 6-bit shamt (funct6 specified)
+    - name: slli
+      encoding: "000000-----------001-----0010011"
+    - name: srli
+      encoding: "000000-----------101-----0010011"
+    - name: srai
+      encoding: "010000-----------101-----0010011"
+
+    # RV64 shift word ops (5-bit shamt, funct7 fully specified)
+    - name: slliw
+      encoding: "0000000----------001-----0011011"
+    - name: srliw
+      encoding: "0000000----------101-----0011011"
+    - name: sraiw
+      encoding: "0100000----------101-----0011011"
+
+    # R-type word ops
+    - name: addw
+      encoding: "0000000----------000-----0111011"
+    - name: subw
+      encoding: "0100000----------000-----0111011"
+    - name: sllw
+      encoding: "0000000----------001-----0111011"
+    - name: srlw
+      encoding: "0000000----------101-----0111011"
+    - name: sraw
+      encoding: "0100000----------101-----0111011"
+
+M:
+  # ext M is implicitly enabled
+  conditions: []
+  instructions:
+    - name: mul
+      encoding: "0000001----------000-----0110011"
+    - name: mulh
+      encoding: "0000001----------001-----0110011"
+    - name: mulhsu
+      encoding: "0000001----------010-----0110011"
+    - name: mulhu
+      encoding: "0000001----------011-----0110011"
+    - name: div
+      encoding: "0000001----------100-----0110011"
+    - name: divu
+      encoding: "0000001----------101-----0110011"
+    - name: rem
+      encoding: "0000001----------110-----0110011"
+    - name: remu
+      encoding: "0000001----------111-----0110011"
+
+M_rv64:
+  # ext M is implicitly enabled
+  conditions: ["rv64"]
+  instructions:
+    - name: mulw
+      encoding: "0000001----------000-----0111011"
+    - name: divw
+      encoding: "0000001----------100-----0111011"
+    - name: divuw
+      encoding: "0000001----------101-----0111011"
+    - name: remw
+      encoding: "0000001----------110-----0111011"
+    - name: remuw
+      encoding: "0000001----------111-----0111011"
+
+A:
+  conditions: ["a"]
+  instructions:
+    - name: lr_w
+      encoding: "00010--00000-----010-----0101111"
+    - name: sc_w
+      encoding: "00011------------010-----0101111"
+    - name: amoswap_w
+      encoding: "00001------------010-----0101111"
+    - name: amoadd_w
+      encoding: "00000------------010-----0101111"
+    - name: amoxor_w
+      encoding: "00100------------010-----0101111"
+    - name: amoand_w
+      encoding: "01100------------010-----0101111"
+    - name: amoor_w
+      encoding: "01000------------010-----0101111"
+    - name: amomin_w
+      encoding: "10000------------010-----0101111"
+    - name: amomax_w
+      encoding: "10100------------010-----0101111"
+    - name: amominu_w
+      encoding: "11000------------010-----0101111"
+    - name: amomaxu_w
+      encoding: "11100------------010-----0101111"
+
+A_rv64:
+  conditions: ["rv64", "a"]
+  instructions:
+    - name: lr_d
+      encoding: "00010--00000-----011-----0101111"
+    - name: sc_d
+      encoding: "00011------------011-----0101111"
+    - name: amoswap_d
+      encoding: "00001------------011-----0101111"
+    - name: amoadd_d
+      encoding: "00000------------011-----0101111"
+    - name: amoxor_d
+      encoding: "00100------------011-----0101111"
+    - name: amoand_d
+      encoding: "01100------------011-----0101111"
+    - name: amoor_d
+      encoding: "01000------------011-----0101111"
+    - name: amomin_d
+      encoding: "10000------------011-----0101111"
+    - name: amomax_d
+      encoding: "10100------------011-----0101111"
+    - name: amominu_d
+      encoding: "11000------------011-----0101111"
+    - name: amomaxu_d
+      encoding: "11100------------011-----0101111"

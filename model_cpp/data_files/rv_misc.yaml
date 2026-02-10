@@ -1,0 +1,49 @@
+Zicsr:
+  # ext Zicsr is implicitly enabled
+  conditions: []
+  instructions:
+    - name: csrrw
+      encoding: "-----------------001-----1110011"
+    - name: csrrs
+      encoding: "-----------------010-----1110011"
+    - name: csrrc
+      encoding: "-----------------011-----1110011"
+    - name: csrrwi
+      encoding: "-----------------101-----1110011"
+    - name: csrrsi
+      encoding: "-----------------110-----1110011"
+    - name: csrrci
+      encoding: "-----------------111-----1110011"
+
+Zifencei:
+  # fence.i is implicitly enabled
+  conditions: []
+  instructions:
+    - name: fence_i
+      encoding: "-----------------001-----0001111"
+
+I_misc:
+  conditions: []
+  instructions:
+    - name: fence
+      encoding: "0000--------00000000000000001111"
+    - name: ecall
+      encoding: "00000000000000000000000001110011"
+    - name: ebreak
+      encoding: "00000000000100000000000001110011"
+
+Sm:
+  conditions: ["mmode"]
+  instructions:
+    - name: mret
+      encoding: "00110000001000000000000001110011"
+    - name: wfi
+      encoding: "00010000010100000000000001110011"
+
+Ss:
+  conditions: ["smode"]
+  instructions:
+    - name: sret
+      encoding: "00010000001000000000000001110011"
+    - name: sfence_vma
+      encoding: "0001001----------000000001110011"

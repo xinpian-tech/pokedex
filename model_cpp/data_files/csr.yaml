@@ -1,0 +1,47 @@
+# floating-point CSRs (user)
+F:
+  conditions: ["f"]
+  csr:
+    fflags:     { priv: urw, idx: 0x001 }
+    frm:        { priv: urw, idx: 0x002 }
+    fcsr:       { priv: urw, idx: 0x003 }
+
+# vector CSRs (user)
+V:
+  conditions: ["v"]
+  csr:
+    vstart:     { priv: urw, idx: 0x008 }
+    vxsat:      { priv: urw, idx: 0x009 }
+    vxrm:       { priv: urw, idx: 0x00a }
+    vcsr:       { priv: urw, idx: 0x00f }
+
+    vl:         { priv: uro, idx: 0xc20 }
+    vtype:      { priv: uro, idx: 0xc21 }
+    vlenb:      { priv: uro, idx: 0xc22 }
+
+# machine CSRs
+Sm:
+  conditions: ["mmode"]
+  csr:
+    mstatus:    { priv: mrw, idx: 0x300 }
+    misa:       { priv: mrw, idx: 0x301 }
+    medeleg:    { priv: mrw, idx: 0x302, conditions: ["smode"] }
+    mideleg:    { priv: mrw, idx: 0x303, conditions: ["smode"] }
+    mie:        { priv: mrw, idx: 0x304 }
+    mtvec:      { priv: mrw, idx: 0x305 }
+    mcounteren: { priv: mrw, idx: 0x306 }
+    mstatush:   { priv: mrw, idx: 0x310, conditions: ["rv32"] }
+    medelegh:   { priv: mrw, idx: 0x312, conditions: ["rv32", "smode"] }
+    mscratch:   { priv: mrw, idx: 0x340 }
+    mepc:       { priv: mrw, idx: 0x341 }
+    mcause:     { priv: mrw, idx: 0x342 }
+    mip:        { priv: mrw, idx: 0x344 }
+    menvcfg:    { priv: mrw, idx: 0x30a }
+    menvcfgh:   { priv: mrw, idx: 0x31a, conditions: ["rv32"] }
+    mseccfg:    { priv: mrw, idx: 0x747 }
+    mseccfgh:   { priv: mrw, idx: 0x757, conditions: ["rv32"] }
+    mvendorid:  { priv: mro, idx: 0xf11 }
+    marchid:    { priv: mro, idx: 0xf12 }
+    mimpid:     { priv: mro, idx: 0xf13 }
+    mhartid:    { priv: mro, idx: 0xf14 }
+    mconfigptr: { priv: mro, idx: 0xf15 }

@@ -1,0 +1,157 @@
+F:
+  conditions: ["f"]
+  instructions:
+    # Single-precision loads/stores
+    - name: flw
+      encoding: "-----------------010-----0000111"
+    - name: fsw
+      encoding: "-----------------010-----0100111"
+
+    # Fused multiply-add (S)
+    - name: fmadd_s
+      encoding: "-----00------------------1000011"
+    - name: fmsub_s
+      encoding: "-----00------------------1000111"
+    - name: fnmsub_s
+      encoding: "-----00------------------1001011"
+    - name: fnmadd_s
+      encoding: "-----00------------------1001111"
+
+    # Basic arithmetic (S)
+    - name: fadd_s
+      encoding: "0000000------------------1010011"
+    - name: fsub_s
+      encoding: "0000100------------------1010011"
+    - name: fmul_s
+      encoding: "0001000------------------1010011"
+    - name: fdiv_s
+      encoding: "0001100------------------1010011"
+    - name: fsqrt_s
+      encoding: "010110000000-------------1010011"
+
+    # Sign injection / min-max (S)
+    - name: fsgnj_s
+      encoding: "0010000----------000-----1010011"
+    - name: fsgnjn_s
+      encoding: "0010000----------001-----1010011"
+    - name: fsgnjx_s
+      encoding: "0010000----------010-----1010011"
+    - name: fmin_s
+      encoding: "0010100----------000-----1010011"
+    - name: fmax_s
+      encoding: "0010100----------001-----1010011"
+
+    # Conversions and moves involving S
+    - name: fcvt_w_s
+      encoding: "110000000000-------------1010011"
+    - name: fcvt_wu_s
+      encoding: "110000000001-------------1010011"
+    - name: fmv_x_w
+      encoding: "111000000000-----000-----1010011"
+    - name: fclass_s
+      encoding: "111000000000-----001-----1010011"
+    - name: feq_s
+      encoding: "1010000----------010-----1010011"
+    - name: flt_s
+      encoding: "1010000----------001-----1010011"
+    - name: fle_s
+      encoding: "1010000----------000-----1010011"
+    - name: fcvt_s_w
+      encoding: "110100000000-------------1010011"
+    - name: fcvt_s_wu
+      encoding: "110100000001-------------1010011"
+    - name: fmv_w_x
+      encoding: "111100000000-----000-----1010011"
+
+F_rv64:
+  conditions: ["rv64", "f"]
+  instructions:
+    - name: fcvt_l_s
+      encoding: "110000000010-------------1010011"
+    - name: fcvt_lu_s
+      encoding: "110000000011-------------1010011"
+    - name: fcvt_s_l
+      encoding: "110100000010-------------1010011"
+    - name: fcvt_s_lu
+      encoding: "110100000011-------------1010011"
+
+D:
+  conditions: ["d"]
+  instructions:
+    # Double-precision loads/stores
+    - name: fld
+      encoding: "-----------------011-----0000111"
+    - name: fsd
+      encoding: "-----------------011-----0100111"
+
+    # Fused multiply-add (D)
+    - name: fmadd_d
+      encoding: "-----01------------------1000011"
+    - name: fmsub_d
+      encoding: "-----01------------------1000111"
+    - name: fnmsub_d
+      encoding: "-----01------------------1001011"
+    - name: fnmadd_d
+      encoding: "-----01------------------1001111"
+
+    # Basic arithmetic (D)
+    - name: fadd_d
+      encoding: "0000001------------------1010011"
+    - name: fsub_d
+      encoding: "0000101------------------1010011"
+    - name: fmul_d
+      encoding: "0001001------------------1010011"
+    - name: fdiv_d
+      encoding: "0001101------------------1010011"
+    - name: fsqrt_d
+      encoding: "010110100000-------------1010011"
+
+    # Sign injection / min-max (D)
+    - name: fsgnj_d
+      encoding: "0010001----------000-----1010011"
+    - name: fsgnjn_d
+      encoding: "0010001----------001-----1010011"
+    - name: fsgnjx_d
+      encoding: "0010001----------010-----1010011"
+    - name: fmin_d
+      encoding: "0010101----------000-----1010011"
+    - name: fmax_d
+      encoding: "0010101----------001-----1010011"
+
+    # Conversions and comparisons involving D
+    - name: fcvt_s_d
+      encoding: "010000000001-------------1010011"
+    - name: fcvt_d_s
+      encoding: "010000100000-------------1010011"
+    - name: feq_d
+      encoding: "1010001----------010-----1010011"
+    - name: flt_d
+      encoding: "1010001----------001-----1010011"
+    - name: fle_d
+      encoding: "1010001----------000-----1010011"
+    - name: fclass_d
+      encoding: "111000100000-----001-----1010011"
+    - name: fcvt_w_d
+      encoding: "110000100000-------------1010011"
+    - name: fcvt_wu_d
+      encoding: "110000100001-------------1010011"
+    - name: fcvt_d_w
+      encoding: "110100100000-------------1010011"
+    - name: fcvt_d_wu
+      encoding: "110100100001-------------1010011"
+
+D_rv64:
+  conditions: ["rv64", "d"]
+  instructions:
+    - name: fcvt_l_d
+      encoding: "110000100010-------------1010011"
+    - name: fcvt_lu_d
+      encoding: "110000100011-------------1010011"
+    - name: fmv_x_d
+      encoding: "111000100000-----000-----1010011"
+    - name: fcvt_d_l
+      encoding: "110100100010-------------1010011"
+    - name: fcvt_d_lu
+      encoding: "110100100011-------------1010011"
+    - name: fmv_d_x
+      encoding: "111100100000-----000-----1010011"

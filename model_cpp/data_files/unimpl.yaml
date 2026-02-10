@@ -1,0 +1,159 @@
+inst:
+  # RV64I
+  - lwu
+  - ld
+  - sd
+  - addiw
+  - slliw
+  - srliw
+  - sraiw
+  - addw
+  - subw
+  - sllw
+  - srlw
+  - sraw
+
+  # RV64M
+  - mulw
+  - divw
+  - divuw
+  - remw
+  - remuw
+
+  # RV64A
+  - lr_d
+  - sc_d
+  - amoswap_d
+  - amoadd_d
+  - amoxor_d
+  - amoand_d
+  - amoor_d
+  - amomin_d
+  - amomax_d
+  - amominu_d
+  - amomaxu_d
+
+  # RVF
+  - flw
+  - fsw
+  - fmadd_s
+  - fmsub_s
+  - fnmsub_s
+  - fnmadd_s
+  - fadd_s
+  - fsub_s
+  - fmul_s
+  - fdiv_s
+  - fsqrt_s
+  - fsgnj_s
+  - fsgnjn_s
+  - fsgnjx_s
+  - fmin_s
+  - fmax_s
+  - fcvt_w_s
+  - fcvt_wu_s
+  - fmv_x_w
+  - fclass_s
+  - feq_s
+  - flt_s
+  - fle_s
+  - fcvt_s_w
+  - fcvt_s_wu
+  - fmv_w_x
+
+  # RVF rv64
+  - fcvt_l_s
+  - fcvt_lu_s
+  - fcvt_s_l
+  - fcvt_s_lu
+
+  # RVD
+  - fld
+  - fsd
+  - fmadd_d
+  - fmsub_d
+  - fnmsub_d
+  - fnmadd_d
+  - fadd_d
+  - fsub_d
+  - fmul_d
+  - fdiv_d
+  - fsqrt_d
+  - fsgnj_d
+  - fsgnjn_d
+  - fsgnjx_d
+  - fmin_d
+  - fmax_d
+  - fcvt_s_d
+  - fcvt_d_s
+  - feq_d
+  - flt_d
+  - fle_d
+  - fclass_d
+  - fcvt_w_d
+  - fcvt_wu_d
+  - fcvt_d_w
+  - fcvt_d_wu
+
+  # RVD rv64
+  - fcvt_l_d
+  - fcvt_lu_d
+  - fmv_x_d
+  - fcvt_d_l
+  - fcvt_d_lu
+  - fmv_d_x
+
+  # S-mode
+  - sret
+  - sfence_vma
+
+inst_c:
+  # RV64C
+  - c_ld
+  - c_sd
+  - c_addiw
+  - c_subw
+  - c_addw
+  - c_ldsp
+  - c_sdsp
+
+  # Zcf (RV32 compressed single-precision FP)
+  - c_flw
+  - c_fsw
+  - c_flwsp
+  - c_fswsp
+
+  # Zcd (compressed double-precision FP)
+  - c_fld
+  - c_fsd
+  - c_fldsp
+  - c_fsdsp
+
+csr:
+  # floating-point CSRs
+  - fflags
+  - frm
+  - fcsr
+
+  # vector CSRs
+  - vstart
+  - vxsat
+  - vxrm
+  - vcsr
+  - vl
+  - vtype
+  - vlenb
+
+  # machine-mode CSRs
+  - misa
+  - medeleg
+  - mideleg
+  - mie
+  - mcounteren
+  - mstatush
+  - medelegh
+  - mip
+  - menvcfg
+  - menvcfgh
+  - mseccfg
+  - mseccfgh

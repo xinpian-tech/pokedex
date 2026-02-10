@@ -1,0 +1,1 @@
+option('pokedex_include_dir', type : 'string', value : '../simulator/include')
