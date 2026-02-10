@@ -1,0 +1,6 @@
+{
+    global:
+        EXPORT_*;
+    local:
+        *;
+};

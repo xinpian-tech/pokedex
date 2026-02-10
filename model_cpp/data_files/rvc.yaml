@@ -1,0 +1,122 @@
+Zca:
+  conditions: ["c"]
+  instructions:
+    # Quadrant 0 (loads/stores + stack-pointer add)
+    - name: c_addi4spn
+      encoding: "000-----------00"
+    - name: c_lw
+      encoding: "010-----------00"
+    - name: c_sw
+      encoding: "110-----------00"
+
+    # Quadrant 1 (immediates / constant generation)
+    - name: c_nop
+      encoding: "000-00000-----01"
+    - name: c_addi
+      encoding: "000-----------01"
+    - name: c_li
+      encoding: "010-----------01"
+    - name: c_addi16sp
+      encoding: "011-00010-----01"
+    - name: c_lui
+      encoding: "011-----------01"
+
+    # Quadrant 1 (ALU ops)
+    - name: c_andi
+      encoding: "100-10--------01"
+    - name: c_sub
+      encoding: "100011---00---01"
+    - name: c_xor
+      encoding: "100011---01---01"
+    - name: c_or
+      encoding: "100011---10---01"
+    - name: c_and
+      encoding: "100011---11---01"
+
+    # Quadrant 1 (control flow)
+    - name: c_j
+      encoding: "101-----------01"
+    - name: c_beqz
+      encoding: "110-----------01"
+    - name: c_bnez
+      encoding: "111-----------01"
+
+    # Quadrant 2 (stack loads/stores + register jumps/moves)
+    - name: c_lwsp
+      encoding: "010-----------10"
+    - name: c_jr
+      encoding: "1000-----0000010"
+    - name: c_mv
+      encoding: "1000----------10"
+    - name: c_ebreak
+      encoding: "1001000000000010"
+    - name: c_jalr
+      encoding: "1001-----0000010"
+    - name: c_add
+      encoding: "1001----------10"
+    - name: c_swsp
+      encoding: "110-----------10"
+
+Zca_rv32:
+  conditions: ["rv32", "c"]
+  instructions:
+    # RV32-only compressed control/shift ops
+    - name: c_jal
+      encoding: "001-----------01"
+    - name: c_srli
+      encoding: "100000--------01"
+    - name: c_srai
+      encoding: "100001--------01"
+    - name: c_slli
+      encoding: "0000----------10"
+
+Zca_rv64:
+  conditions: ["rv64", "c"]
+  instructions:
+    # RV64-only compressed integer/LD-SD ops
+    - name: c_ld
+      encoding: "011-----------00"
+    - name: c_sd
+      encoding: "111-----------00"
+    - name: c_addiw
+      encoding: "001-----------01"
+    - name: c_srli
+      encoding: "100-00--------01"
+    - name: c_srai
+      encoding: "100-01--------01"
+    - name: c_subw
+      encoding: "100111---00---01"
+    - name: c_addw
+      encoding: "100111---01---01"
+    - name: c_slli
+      encoding: "000-----------10"
+    - name: c_ldsp
+      encoding: "011-----------10"
+    - name: c_sdsp
+      encoding: "111-----------10"
+
+Zcf:
+  conditions: ["rv32", "c", "f"]
+  instructions:
+    # RV32 compressed single-precision FP loads/stores
+    - name: c_flw
+      encoding: "011-----------00"
+    - name: c_fsw
+      encoding: "111-----------00"
+    - name: c_flwsp
+      encoding: "011-----------10"
+    - name: c_fswsp
+      encoding: "111-----------10"
+
+Zcd:
+  conditions: ["c", "d"]
+  instructions:
+    # Compressed double-precision FP loads/stores
+    - name: c_fld
+      encoding: "001-----------00"
+    - name: c_fsd
+      encoding: "101-----------00"
+    - name: c_fldsp
+      encoding: "001-----------10"
+    - name: c_fsdsp
+      encoding: "101-----------10"

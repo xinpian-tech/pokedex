@@ -1,0 +1,3 @@
+option('pokedex_include_dir', type : 'string', value : '../simulator/include')
+option('softfloat_include_dir', type : 'string')
+option('softfloat_lib_dir', type : 'string')
