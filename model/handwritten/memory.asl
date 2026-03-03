@@ -1,5 +1,16 @@
-func ReadMemory(addr : bits(32), width : integer) => (bits(width), Result)
+// TODO: do we need separate LR/SC, AMO type?
+enumeration AccessType {
+  AT_Fetch,
+  AT_Load,
+  AT_Store
+};
+
+func ReadMemory(addr : bits(32), width : integer{8, 16, 32}) => (bits(width), Result)
 begin
+  if !CheckPMP(addr, width, AT_Load) then
+    return (Zeros(width), ExceptionMemory(CAUSE_LOAD_ACCESS, addr));
+  end
+
   case width of
     when 8 =>
       let ffi_read : FFI_ReadResult(8) = FFI_read_physical_memory_8bits(addr);
@@ -38,6 +49,10 @@ end
 
 func WriteMemory{width : integer{8,16,32}}(addr : bits(32), data : bits(width)) => Result
 begin
+  if !CheckPMP(addr, width, AT_Store) then
+    return ExceptionMemory(CAUSE_STORE_ACCESS, addr);
+  end
+
   case width of
     when 8 =>
       // We know that data must be 8 in this branch, however the type system doesn't know.
@@ -75,4 +90,16 @@ begin
       return Retired();
     otherwise => assert FALSE;
   end
+end
+
+func InstructionFetch(pc : bits(32)) => FFI_ReadResult(16)
+begin
+  if !CheckPMP(pc, 16, AT_Fetch) then
+    return FFI_ReadResult(16) {
+      success = FALSE,
+      data = Zeros(16)
+    };
+  end
+
+  return FFI_instruction_fetch_half(pc);
 end

@@ -58,6 +58,7 @@ class CustomWriter(ninja_syntax.Writer):
         self.dry_run = dry_run
         self.config = config
         self.config_path = config_path
+        print(f"Generating using {config_path}")
 
     def var_env(self, env_name: str):
         self.variable(env_name, os.environ[env_name])
@@ -223,7 +224,7 @@ class CustomWriter(ninja_syntax.Writer):
 
         other_outputs = [
             (
-                w.build_jinja(f"build/1-gennew/{x.with_suffix(".asl")}", str(x))
+                w.build_jinja(f"build/1-gennew/{x.with_suffix('.asl')}", str(x))
                 if x.suffix == ".j2"
                 else str(x)
             )
