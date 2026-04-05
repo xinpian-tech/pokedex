@@ -6,7 +6,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     pokedex-configs-src = {
-      url = "git+ssh://git@github.com/xinpian-tech/pokedex-configs.git?ref=master";
+      url = "path:./configs";
       flake = false;
     };
   };

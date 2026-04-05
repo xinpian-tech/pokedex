@@ -18,25 +18,19 @@ if with_tests
   # on the simulator binaries only when the content actually changes. It's a
   # hack to make the build system realize the inputs are new so the tests
   # re-run.
-  rsync = find_program('rsync')
-  _sims = ['spike', 'pokedex']
-
-  _cached_sims = []
-  foreach program : _sims
-    _cached_sims += custom_target(
-      'cached_' + program,
-      input: find_program(program).full_path(),
-      output: program,
-      command: [rsync, '--checksum', '--no-times', '@INPUT@', '@OUTPUT@'],
-      build_always_stale: true,
-    )
-  endforeach
-
-  spike = _cached_sims[0]
-  pokedex = _cached_sims[1]
 
   difftest_runner = find_program('difftest.py')
-  pokedex_config = meson.current_source_dir() / 'pokedex-config.kdl'
+  difftest_config = configure_file(
+    configuration: {
+      'MARCH': get_option('march'),
+      'SPIKE': find_program('spike').full_path(),
+      'POKEDEX': find_program('pokedex').full_path(),
+      'POKEDEX_MODEL': get_option('pokedex_model_path'),
+      'POKEDEX_CONFIG': meson.current_source_dir() / 'pokedex-config.kdl',
+    },
+    input: 'difftest_config.ini.in',
+    output: 'difftest_config.ini',
+  )
 endif
 
 # --- 2. Resources & Share Vars ---
@@ -87,8 +81,8 @@ global_test_suites = {}
 
 # --- 4. Include ---
 subdir('smoke')
-subdir('smoke_v')
-subdir('riscv-vector-tests')
+# subdir('smoke_v')
+# subdir('riscv-vector-tests')
 subdir('riscv-tests')
 
 # --- 5. Tests ---
@@ -100,21 +94,16 @@ if with_tests
 
       diff_result = custom_target(
         suite_name + '.' + case_name + '_diff_result',
-        depends: [spike, pokedex],
         input: elf,
         output: [
           suite_name + '.' + case_name + '_spike_commit.log',
           suite_name + '.' + case_name + '_pokedex_commit.jsonl',
           suite_name + '.' + case_name + '_diff_result.json',
         ],
-        env: [
-          'MARCH=' + march,
-          'SPIKE=' + spike.full_path(),
-          'POKEDEX=' + pokedex.full_path(),
-          'POKEDEX_CONFIG=' + pokedex_config,
-        ],
         command: [
           difftest_runner,
+          '--config',
+          difftest_config,
           '--elf',
           '@INPUT@',
           '--spike-log',

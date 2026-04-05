@@ -27,11 +27,11 @@ lib.makeScope newScope (scope: {
         scope.prebuilt-cases
         scope.run
       ];
-      env = scope.run.env // {
+      env = {
         # Using mesonFlags accidentally overlap the default key.
         MESON_FLAGS =
           (
-            scope.prebuilt-cases.mesonFlags
+            scope.run.mesonFlags
             ++ [
               (lib.mesonEnable "with_tests" true)
             ]

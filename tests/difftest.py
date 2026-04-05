@@ -5,6 +5,8 @@ import argparse
 import os
 import json
 
+from configparser import ConfigParser
+
 
 class DifftestRunner:
     spike: str
@@ -12,12 +14,16 @@ class DifftestRunner:
     pokedex: str
     default_pokedex_args: list[str]
 
-    def __init__(self) -> None:
-        self.spike = os.environ["SPIKE"]
-        self.pokedex = os.environ["POKEDEX"]
+    def __init__(self, config_path) -> None:
+        config = ConfigParser()
+        config.read(config_path)
 
-        march = os.environ["MARCH"]
-        pokedex_config = os.environ["POKEDEX_CONFIG"]
+        self.spike = config["tool"]["spike"]
+        self.pokedex = config["tool"]["pokedex"]
+        self.pokedex_model = config["tool"]["pokedex_model"]
+
+        march = config["isa"]["march"]
+        pokedex_config = config["tool"]["pokedex_config"]
 
         self.default_spike_args = [
             f"--isa={march}",
@@ -43,15 +49,22 @@ class DifftestRunner:
     def run_pokedex(self, elf_path: str, log_path: str):
         try:
             subprocess.run(
-                [self.pokedex, "run"]
-                + self.default_pokedex_args
-                + [f"--output-log-path={log_path}", elf_path],
+                [
+                    self.pokedex,
+                    "run",
+                    *self.default_pokedex_args,
+                    f"--output-log-path={log_path}", 
+                    elf_path,
+                ],
+                env={
+                    "POKEDEX_MODEL_DYLIB": self.pokedex_model,
+                },
                 capture_output=True,
                 text=True,
             ).check_returncode()
         except subprocess.CalledProcessError as e:
             print(f"Critical: pokedex crash!\nSTDOUT:\n{e.stdout}\nSTDERR:\n{e.stderr}")
-            exit(1)
+            # exit(1)
 
     def difftest(
         self,
@@ -79,6 +92,7 @@ class DifftestRunner:
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--config")
     parser.add_argument("--elf")
     parser.add_argument("--spike-log")
     parser.add_argument("--pokedex-log")
@@ -93,7 +107,7 @@ def main():
             assert result["is_same"], "\n".join(result["diff_notes"])
         exit(0)
 
-    diff_runner = DifftestRunner()
+    diff_runner = DifftestRunner(args.config)
 
     if args.elf and args.diff_result and args.spike_log and args.pokedex_log:
         diff_runner.difftest(

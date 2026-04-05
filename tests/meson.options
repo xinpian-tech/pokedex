@@ -8,3 +8,4 @@ option('riscv_tests_src',     type: 'string',  value: '',                       
 option('codegen_install_dir', type: 'string',  value: '',                         description: 'Path to riscv-vector-tests sources')
 option('with_tests',          type: 'feature', value: 'disabled',                 description: 'Enable testing')
 option('prebuilt_case_dir',   type: 'string',  value: '',                         description: 'Path to existing ELFs (skips building ELF)')
+option('pokedex_model_path',  type: 'string',  value: '',                                   description: 'Path to pokedex model')

@@ -7,13 +7,13 @@
   ninja,
   spike,
   dtc,
-  model-asl,
+  model-cpp,
   simulator,
   python3,
   prebuilt-cases,
 }:
 let
-  model = model-asl;
+  model = model-cpp;
   inherit (pokedex-configs.profile)
     march
     vlen
@@ -57,10 +57,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   doCheck = true;
 
   passthru.env = finalAttrs.env;
-
-  env = {
-    POKEDEX_MODEL_DYLIB = "${model}/lib/libpokedex_model.so";
-  };
+  env = {};
 
   patchPhase = ''
     runHook prePatch
@@ -79,6 +76,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     (lib.mesonEnable "scalar_fp" scalar_fp)
     (lib.mesonEnable "with_tests" true)
     (lib.mesonOption "prebuilt_case_dir" (toString prebuilt-cases))
+    (lib.mesonOption "pokedex_model_path" "${model}/lib/libpokedex_model.so")
   ];
 
   dontFixup = true;

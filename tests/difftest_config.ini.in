@@ -1,0 +1,8 @@
+[tool]
+spike=@SPIKE@
+pokedex=@POKEDEX@
+pokedex_model=@POKEDEX_MODEL@
+pokedex_config=@POKEDEX_CONFIG@
+
+[isa]
+march=@MARCH@

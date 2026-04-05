@@ -44,6 +44,7 @@ lib.makeScope newScope (
       };
 
       model-asl = scope.callPackage ./model_asl/package.nix { };
+      model-cpp = scope.callPackage ./model_cpp/package.nix { };
 
       tests = scope.callPackage ./tests { };
       docs = scope.callPackage ./docs/package.nix { };
