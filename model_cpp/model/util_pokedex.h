@@ -128,7 +128,7 @@ struct TraceBuffer {
 
     void vreg_write_multiple(uint32_t vd_mask) {
         assert(m_inner.valid);
-        m_inner.freg_mask |= vd_mask;
+        m_inner.vreg_mask |= vd_mask;
     }
 
     void csr_write(uint16_t csr) {

@@ -6,6 +6,7 @@ ExecResult do_execute(CoreModel& core, Inst inst, MemCallback mem, NextPc& npc) 
   constexpr bool ext_a = true;
   constexpr bool ext_f = CoreModel::FLEN >= 32;
   constexpr bool ext_d = CoreModel::FLEN >= 64;
+  constexpr bool ext_v = CoreModel::EXT_V;
   constexpr bool ext_mmode = true;
   constexpr bool ext_smode = false;
 
@@ -646,6 +647,274 @@ ExecResult do_execute(CoreModel& core, Inst inst, MemCallback mem, NextPc& npc) 
     if (inst.match(0xfff0707f, 0xf2000053)) {
       // fmv.d.x
       return EXECUTE_FMV_D_X(core, inst, mem, npc);
+    }
+  }
+
+  // inst group: V
+  if constexpr (ext_v) {
+    if (inst.match(0x8000707f, 0x00007057)) {
+      // vsetvli
+      return EXECUTE_VSETVLI(core, inst, mem, npc);
+    }
+    if (inst.match(0xc000707f, 0xc0007057)) {
+      // vsetivli
+      return EXECUTE_VSETIVLI(core, inst, mem, npc);
+    }
+    if (inst.match(0xfe00707f, 0x80007057)) {
+      // vsetvl
+      return EXECUTE_VSETVL(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x00003057)) {
+      // vadd.vi
+      return EXECUTE_VADD_VI(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x00000057)) {
+      // vadd.vv
+      return EXECUTE_VADD_VV(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x00004057)) {
+      // vadd.vx
+      return EXECUTE_VADD_VX(core, inst, mem, npc);
+    }
+    if (inst.match(0xfe00707f, 0x5e003057)) {
+      // vmv.v.i
+      return EXECUTE_VMV_V_I(core, inst, mem, npc);
+    }
+  }
+
+  // inst group: Vmem
+  if constexpr (ext_v) {
+    if (inst.match(0xfff0707f, 0x02800007)) {
+      // vl1re8.v
+      return EXECUTE_VL1RE8_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x02805007)) {
+      // vl1re16.v
+      return EXECUTE_VL1RE16_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x02806007)) {
+      // vl1re32.v
+      return EXECUTE_VL1RE32_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x02807007)) {
+      // vl1re64.v
+      return EXECUTE_VL1RE64_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x22800007)) {
+      // vl2re8.v
+      return EXECUTE_VL2RE8_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x22805007)) {
+      // vl2re16.v
+      return EXECUTE_VL2RE16_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x22806007)) {
+      // vl2re32.v
+      return EXECUTE_VL2RE32_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x22807007)) {
+      // vl2re64.v
+      return EXECUTE_VL2RE64_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x62800007)) {
+      // vl4re8.v
+      return EXECUTE_VL4RE8_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x62805007)) {
+      // vl4re16.v
+      return EXECUTE_VL4RE16_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x62806007)) {
+      // vl4re32.v
+      return EXECUTE_VL4RE32_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x62807007)) {
+      // vl4re64.v
+      return EXECUTE_VL4RE64_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0xe2800007)) {
+      // vl8re8.v
+      return EXECUTE_VL8RE8_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0xe2805007)) {
+      // vl8re16.v
+      return EXECUTE_VL8RE16_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0xe2806007)) {
+      // vl8re32.v
+      return EXECUTE_VL8RE32_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0xe2807007)) {
+      // vl8re64.v
+      return EXECUTE_VL8RE64_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfdf0707f, 0x00000007)) {
+      // vle8.v
+      return EXECUTE_VLE8_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfdf0707f, 0x00005007)) {
+      // vle16.v
+      return EXECUTE_VLE16_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfdf0707f, 0x00006007)) {
+      // vle32.v
+      return EXECUTE_VLE32_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfdf0707f, 0x00007007)) {
+      // vle64.v
+      return EXECUTE_VLE64_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x02b00007)) {
+      // vlm.v
+      return EXECUTE_VLM_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfdf0707f, 0x01000007)) {
+      // vle8ff.v
+      return EXECUTE_VLE8FF_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfdf0707f, 0x01005007)) {
+      // vle16ff.v
+      return EXECUTE_VLE16FF_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfdf0707f, 0x01006007)) {
+      // vle32ff.v
+      return EXECUTE_VLE32FF_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfdf0707f, 0x01007007)) {
+      // vle64ff.v
+      return EXECUTE_VLE64FF_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x08000007)) {
+      // vlse8.v
+      return EXECUTE_VLSE8_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x08005007)) {
+      // vlse16.v
+      return EXECUTE_VLSE16_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x08006007)) {
+      // vlse32.v
+      return EXECUTE_VLSE32_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x08007007)) {
+      // vlse64.v
+      return EXECUTE_VLSE64_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x04000007)) {
+      // vluxei8.v
+      return EXECUTE_VLUXEI8_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x04005007)) {
+      // vluxei16.v
+      return EXECUTE_VLUXEI16_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x04006007)) {
+      // vluxei32.v
+      return EXECUTE_VLUXEI32_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x04007007)) {
+      // vluxei64.v
+      return EXECUTE_VLUXEI64_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x0c000007)) {
+      // vloxei8.v
+      return EXECUTE_VLOXEI8_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x0c005007)) {
+      // vloxei16.v
+      return EXECUTE_VLOXEI16_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x0c006007)) {
+      // vloxei32.v
+      return EXECUTE_VLOXEI32_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x0c007007)) {
+      // vloxei64.v
+      return EXECUTE_VLOXEI64_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x02800027)) {
+      // vs1r.v
+      return EXECUTE_VS1R_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x22800027)) {
+      // vs2r.v
+      return EXECUTE_VS2R_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x62800027)) {
+      // vs4r.v
+      return EXECUTE_VS4R_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0xe2800027)) {
+      // vs8r.v
+      return EXECUTE_VS8R_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfdf0707f, 0x00000027)) {
+      // vse8.v
+      return EXECUTE_VSE8_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfdf0707f, 0x00005027)) {
+      // vse16.v
+      return EXECUTE_VSE16_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfdf0707f, 0x00006027)) {
+      // vse32.v
+      return EXECUTE_VSE32_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfdf0707f, 0x00007027)) {
+      // vse64.v
+      return EXECUTE_VSE64_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfff0707f, 0x02b00027)) {
+      // vsm.v
+      return EXECUTE_VSM_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x08000027)) {
+      // vsse8.v
+      return EXECUTE_VSSE8_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x08005027)) {
+      // vsse16.v
+      return EXECUTE_VSSE16_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x08006027)) {
+      // vsse32.v
+      return EXECUTE_VSSE32_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x08007027)) {
+      // vsse64.v
+      return EXECUTE_VSSE64_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x04000027)) {
+      // vsuxei8.v
+      return EXECUTE_VSUXEI8_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x04005027)) {
+      // vsuxei16.v
+      return EXECUTE_VSUXEI16_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x04006027)) {
+      // vsuxei32.v
+      return EXECUTE_VSUXEI32_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x04007027)) {
+      // vsuxei64.v
+      return EXECUTE_VSUXEI64_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x0c000027)) {
+      // vsoxei8.v
+      return EXECUTE_VSOXEI8_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x0c005027)) {
+      // vsoxei16.v
+      return EXECUTE_VSOXEI16_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x0c006027)) {
+      // vsoxei32.v
+      return EXECUTE_VSOXEI32_V(core, inst, mem, npc);
+    }
+    if (inst.match(0xfc00707f, 0x0c007027)) {
+      // vsoxei64.v
+      return EXECUTE_VSOXEI64_V(core, inst, mem, npc);
     }
   }
 

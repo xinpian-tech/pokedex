@@ -37,6 +37,9 @@ static void unimpl_csr_inspect(CsrIdx csr) {
 #include "rvf/conversion.inc"
 #include "rvf/move.inc"
 #include "rvf/memory.inc"
+#include "rvv/arith.inc"
+#include "rvv/vsetvl.inc"
+#include "rvvmem/unitstride.inc"
 
 // Compressed instruction implementations
 #include "rvc/c_control.inc"

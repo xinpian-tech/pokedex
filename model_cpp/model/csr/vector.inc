@@ -1,5 +1,32 @@
 #include "../model_util.h"
 
+struct CSR_VSTART {
+  static constexpr uint16_t INDEX = 0x008;
+  static constexpr bool WRITABLE = true;
+
+  static ExecResult do_read(CoreModel& core, uint32_t* ret) {
+    REQUIRE_VECTOR(core);
+
+    *ret = do_inspect(core);
+    return ExecResult::ok();
+  }
+
+  static ExecResult do_write(CoreModel& core, uint32_t value) {
+    REQUIRE_VECTOR(core);
+
+    core.m_vstart = value & (core.VLEN - 1);
+    core.trace->csr_write(INDEX);
+
+    core.mark_dirty_vs();
+    return ExecResult::ok();
+  }
+
+  static constexpr bool INSPECTABLE = true;
+  static uint32_t do_inspect(CoreModel const& core) {
+    return core.m_vstart;
+  }
+};
+
 struct CSR_VCSR {
   static constexpr uint16_t INDEX = 0x00f;
   static constexpr bool WRITABLE = true;
@@ -91,4 +118,38 @@ struct CSR_VLENB {
 
   static constexpr bool INSPECTABLE = false;
   static uint32_t do_inspect(CoreModel const& core);
+};
+
+struct CSR_VL {
+  static constexpr uint16_t INDEX = 0xc20;
+  static constexpr bool WRITABLE = false;
+
+  static ExecResult do_read(CoreModel& core, uint32_t* ret) {
+    REQUIRE_VECTOR(core);
+
+    *ret = do_inspect(core);
+    return ExecResult::ok();
+  }
+
+  static constexpr bool INSPECTABLE = true;
+  static uint32_t do_inspect(CoreModel const& core) {
+    return core.m_vtype_vl.vl();
+  }
+};
+
+struct CSR_VTYPE {
+  static constexpr uint16_t INDEX = 0xc21;
+  static constexpr bool WRITABLE = false;
+
+  static ExecResult do_read(CoreModel& core, uint32_t* ret) {
+    REQUIRE_VECTOR(core);
+
+    *ret = do_inspect(core);
+    return ExecResult::ok();
+  }
+
+  static constexpr bool INSPECTABLE = true;
+  static uint32_t do_inspect(CoreModel const& core) {
+    return core.m_vtype_vl.vtype_bits();
+  }
 };

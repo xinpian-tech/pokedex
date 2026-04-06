@@ -64,6 +64,9 @@ struct Inst {
     XRegIdx xd()  const { return xreg_from_idx((data >> 7) & 0x1f); }
     XRegIdx xs1() const { return xreg_from_idx((data >> 15) & 0x1f); }
     XRegIdx xs2() const { return xreg_from_idx((data >> 20) & 0x1f); }
+    VRegIdx vd()  const { return vreg_from_idx((data >> 7) & 0x1f); }
+    VRegIdx vs1() const { return vreg_from_idx((data >> 15) & 0x1f); }
+    VRegIdx vs2() const { return vreg_from_idx((data >> 20) & 0x1f); }
     FRegIdx fd()  const { return freg_from_idx((data >> 7) & 0x1f); }
     FRegIdx fs1() const { return freg_from_idx((data >> 15) & 0x1f); }
     FRegIdx fs2() const { return freg_from_idx((data >> 20) & 0x1f); }
@@ -124,6 +127,16 @@ struct Inst {
     // CSR zimm (zero-extended): bits[19:15]
     uint32_t zimm_rs1() const {
         return (data >> 15) & 0x1f;
+    }
+
+    // Vector vm bit: inst[25]
+    bool vm() const {
+        return ((data >> 25) & 1) != 0;
+    }
+
+    // Vector simm5 immediate: sext(inst[19:15])
+    int32_t simm5() const {
+        return (int32_t)(data << 12) >> 27;
     }
 };
 

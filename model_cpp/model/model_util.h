@@ -20,6 +20,8 @@ uint32_t do_csr_inspect(CoreModel const& core, CsrIdx csr_idx);
 #define REQUIRE_PRIV_M(core) if (!(core).is_atleast_M()) { return ExecResult::illegal_inst(); }
 #define REQUIRE_FP(core) if (!(core).is_fp_enabled()) { return ExecResult::illegal_inst(); }
 #define REQUIRE_VECTOR(core) if (!(core).is_vector_enabled()) { return ExecResult::illegal_inst(); }
+#define REQUIRE_VTYPE_VALID(core) if (!(core).m_vtype_vl.m_valid) { return ExecResult::illegal_inst(); }
+#define REQUIRE_VSTART_ZERO(core) if ((core).m_vstart != 0) { return ExecResult::illegal_inst(); }
 
 #define REQUIRE_FRM_RESOLVE(frm, core, static_frm) \
     { \

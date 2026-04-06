@@ -2,18 +2,10 @@
 
 #include <cstdlib>
 #include <cstdint>
+#include <cstring>
 #include <new>
 
 #include "model/model.h"
-
-// template<typename Model>
-// constexpr pokedex_model_description model_desc = {
-//     .model_isa = "rv32",
-//     .model_priv = "M",
-//     .xlen = Model::XLEN,
-//     .flen = Model::FLEN,
-//     .vlen = Model::VLEN,
-// };
 
 static inline uint64_t sext64(uint32_t x) {
     return (uint64_t)(int64_t)(int32_t)x;
@@ -48,7 +40,7 @@ struct model_export {
         (void)err_buflen;
 
         // NOTE: use malloc + placement new to avoid linking with libstdc++
-        void* model_ = malloc(alignof(Wrapper), sizeof(Wrapper));
+        void* model_ = aligned_alloc(alignof(Wrapper), sizeof(Wrapper));
         if (!model_) {
             snprintf(err_buf, err_buflen, "malloc failed");
             return nullptr;
@@ -115,6 +107,17 @@ struct model_export {
         }
     }
 
+    static void model_read_vreg(void* model_, uint8_t vs_, uint8_t* ret, size_t ret_len) {
+        Wrapper* wrapper = (Wrapper*)model_;
+        Model& model = wrapper->inner;
+        VRegIdx vs = vreg_from_idx(vs_);
+
+        size_t bytes_per_reg = model.m_vrf.bytes_per_reg();
+        assert(ret_len == bytes_per_reg);
+        size_t offset = size_t(vs.idx) * bytes_per_reg;
+        memcpy(ret, model.m_vrf._data + offset, bytes_per_reg);
+    }
+
     static void model_read_csr(void* model_, uint16_t csr_idx, uint64_t* ret) {
         Wrapper* wrapper = (Wrapper*)model_;
         Model& model = wrapper->inner;
@@ -167,7 +170,7 @@ struct model_export {
         .get_pc = model_read_pc,
         .get_xreg = model_read_xreg,
         .get_freg = model_read_freg,
-        // .get_vreg = model_read_vreg,
+        .get_vreg = model_read_vreg,
         .get_csr = model_read_csr,
     };
 };
@@ -177,4 +180,3 @@ extern "C" __attribute__((visibility("default")))
 const pokedex_model_export* EXPORT_pokedex_get_model_export() {
   return &model_export<CoreModel>::EXPORT_TABLE;
 }
-

@@ -530,8 +530,9 @@ def main():
     # Non-compressed instructions (32-bit, rvi.yaml)
     rvi_groups = load_and_extract(data_dir, "rvi.yaml", is_compressed=False)
     rvf_groups = load_and_extract(data_dir, "rvf.yaml", is_compressed=False)
+    rvv_groups = load_and_extract(data_dir, "rvv.yaml", is_compressed=False)
     rv_misc_groups = load_and_extract(data_dir, "rv_misc.yaml", is_compressed=False)
-    rvi_data = rvi_groups + rvf_groups + rv_misc_groups
+    rvi_data = rvi_groups + rvf_groups + rvv_groups + rv_misc_groups
     write_file(
         output_dir / "do_execute.inc", gen_do_execute(rvi_data, is_compressed=False)
     )

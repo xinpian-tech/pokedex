@@ -76,6 +76,60 @@ inst:
   - fcvt_d_lu
   - fmv_d_x
 
+  # RVV memory
+  - vl1re8_v
+  - vl1re16_v
+  - vl1re32_v
+  - vl1re64_v
+  - vl2re8_v
+  - vl2re16_v
+  - vl2re32_v
+  - vl2re64_v
+  - vl4re8_v
+  - vl4re16_v
+  - vl4re32_v
+  - vl4re64_v
+  - vl8re8_v
+  - vl8re16_v
+  - vl8re32_v
+  - vl8re64_v
+  - vle8ff_v
+  - vle16ff_v
+  - vle32ff_v
+  - vle64_v
+  - vle64ff_v
+  - vlm_v
+  - vluxei8_v
+  - vluxei16_v
+  - vluxei32_v
+  - vluxei64_v
+  - vlse8_v
+  - vlse16_v
+  - vlse32_v
+  - vlse64_v
+  - vloxei8_v
+  - vloxei16_v
+  - vloxei32_v
+  - vloxei64_v
+  - vse64_v
+  - vs1r_v
+  - vs2r_v
+  - vs4r_v
+  - vs8r_v
+  - vsm_v
+  - vsuxei8_v
+  - vsuxei16_v
+  - vsuxei32_v
+  - vsuxei64_v
+  - vsse8_v
+  - vsse16_v
+  - vsse32_v
+  - vsse64_v
+  - vsoxei8_v
+  - vsoxei16_v
+  - vsoxei32_v
+  - vsoxei64_v
+
   # S-mode
   - sret
   - sfence_vma
@@ -103,19 +157,6 @@ inst_c:
   - c_fsdsp
 
 csr:
-  # floating-point CSRs
-  # - fflags
-  # - frm
-  # - fcsr
-
-  # vector CSRs
-  - vstart
-  # - vxsat
-  # - vxrm
-  # - vcsr
-  - vl
-  - vtype
-  # - vlenb
 
   # machine-mode CSRs
   - misa

@@ -5,6 +5,19 @@
 #include <cstdio>
 #include <cstdlib>
 
+[[noreturn]]
+static void todo_exec_exception(uint32_t pc, uint32_t inst, ExecResult res) {
+    fprintf(
+        stderr,
+        "todo: handle exec exception at pc=0x%08x inst=0x%08x code=%u payload=0x%08x\n",
+        pc,
+        inst,
+        unsigned(res.m_code),
+        res.m_payload
+    );
+    abort();
+}
+
 StepResult do_step(CoreModel& core, MemCallback mem) {
     // TODO: check interrupt
 
@@ -34,7 +47,7 @@ StepResult do_step(CoreModel& core, MemCallback mem) {
             // if the inst is not commited, PC should not be modified
             assert(pc == core.m_pc);
 
-            todo("handle exec exception");
+            todo_exec_exception(pc, inst.data, res);
         }
     } else {
         CInst inst = CInst::from_u16(inst_lo);
@@ -48,8 +61,7 @@ StepResult do_step(CoreModel& core, MemCallback mem) {
             // if the inst is not commited, PC should not be modified
             assert(pc == core.m_pc);
 
-            todo("handle exec exception");
+            todo_exec_exception(pc, inst.data, res);
         }
     }
 }
-

@@ -1,0 +1,143 @@
+V:
+  conditions: ["v"]
+  instructions:
+    - name: vsetvli
+      encoding: "0----------------111-----1010111"
+    - name: vsetivli
+      encoding: "11---------------111-----1010111"
+    - name: vsetvl
+      encoding: "1000000----------111-----1010111"
+
+    - name: vadd_vi
+      encoding: "000000-----------011-----1010111"
+    - name: vadd_vv
+      encoding: "000000-----------000-----1010111"
+    - name: vadd_vx
+      encoding: "000000-----------100-----1010111"
+    - name: vmv_v_i
+      encoding: "0101111----------011-----1010111"
+
+Vmem:
+  conditions: ["v"]
+  instructions:
+    - name: vl1re8_v
+      encoding: "000000101000-----000-----0000111"
+    - name: vl1re16_v
+      encoding: "000000101000-----101-----0000111"
+    - name: vl1re32_v
+      encoding: "000000101000-----110-----0000111"
+    - name: vl1re64_v
+      encoding: "000000101000-----111-----0000111"
+    - name: vl2re8_v
+      encoding: "001000101000-----000-----0000111"
+    - name: vl2re16_v
+      encoding: "001000101000-----101-----0000111"
+    - name: vl2re32_v
+      encoding: "001000101000-----110-----0000111"
+    - name: vl2re64_v
+      encoding: "001000101000-----111-----0000111"
+    - name: vl4re8_v
+      encoding: "011000101000-----000-----0000111"
+    - name: vl4re16_v
+      encoding: "011000101000-----101-----0000111"
+    - name: vl4re32_v
+      encoding: "011000101000-----110-----0000111"
+    - name: vl4re64_v
+      encoding: "011000101000-----111-----0000111"
+    - name: vl8re8_v
+      encoding: "111000101000-----000-----0000111"
+    - name: vl8re16_v
+      encoding: "111000101000-----101-----0000111"
+    - name: vl8re32_v
+      encoding: "111000101000-----110-----0000111"
+    - name: vl8re64_v
+      encoding: "111000101000-----111-----0000111"
+
+    - name: vle8_v
+      encoding: "000000-00000-----000-----0000111"
+    - name: vle16_v
+      encoding: "000000-00000-----101-----0000111"
+    - name: vle32_v
+      encoding: "000000-00000-----110-----0000111"
+    - name: vle64_v
+      encoding: "000000-00000-----111-----0000111"
+    - name: vlm_v
+      encoding: "000000101011-----000-----0000111"
+    - name: vle8ff_v
+      encoding: "000000-10000-----000-----0000111"
+    - name: vle16ff_v
+      encoding: "000000-10000-----101-----0000111"
+    - name: vle32ff_v
+      encoding: "000000-10000-----110-----0000111"
+    - name: vle64ff_v
+      encoding: "000000-10000-----111-----0000111"
+
+    - name: vlse8_v
+      encoding: "000010-----------000-----0000111"
+    - name: vlse16_v
+      encoding: "000010-----------101-----0000111"
+    - name: vlse32_v
+      encoding: "000010-----------110-----0000111"
+    - name: vlse64_v
+      encoding: "000010-----------111-----0000111"
+    - name: vluxei8_v
+      encoding: "000001-----------000-----0000111"
+    - name: vluxei16_v
+      encoding: "000001-----------101-----0000111"
+    - name: vluxei32_v
+      encoding: "000001-----------110-----0000111"
+    - name: vluxei64_v
+      encoding: "000001-----------111-----0000111"
+    - name: vloxei8_v
+      encoding: "000011-----------000-----0000111"
+    - name: vloxei16_v
+      encoding: "000011-----------101-----0000111"
+    - name: vloxei32_v
+      encoding: "000011-----------110-----0000111"
+    - name: vloxei64_v
+      encoding: "000011-----------111-----0000111"
+
+    - name: vs1r_v
+      encoding: "000000101000-----000-----0100111"
+    - name: vs2r_v
+      encoding: "001000101000-----000-----0100111"
+    - name: vs4r_v
+      encoding: "011000101000-----000-----0100111"
+    - name: vs8r_v
+      encoding: "111000101000-----000-----0100111"
+
+    - name: vse8_v
+      encoding: "000000-00000-----000-----0100111"
+    - name: vse16_v
+      encoding: "000000-00000-----101-----0100111"
+    - name: vse32_v
+      encoding: "000000-00000-----110-----0100111"
+    - name: vse64_v
+      encoding: "000000-00000-----111-----0100111"
+    - name: vsm_v
+      encoding: "000000101011-----000-----0100111"
+
+    - name: vsse8_v
+      encoding: "000010-----------000-----0100111"
+    - name: vsse16_v
+      encoding: "000010-----------101-----0100111"
+    - name: vsse32_v
+      encoding: "000010-----------110-----0100111"
+    - name: vsse64_v
+      encoding: "000010-----------111-----0100111"
+    - name: vsuxei8_v
+      encoding: "000001-----------000-----0100111"
+    - name: vsuxei16_v
+      encoding: "000001-----------101-----0100111"
+    - name: vsuxei32_v
+      encoding: "000001-----------110-----0100111"
+    - name: vsuxei64_v
+      encoding: "000001-----------111-----0100111"
+    - name: vsoxei8_v
+      encoding: "000011-----------000-----0100111"
+    - name: vsoxei16_v
+      encoding: "000011-----------101-----0100111"
+    - name: vsoxei32_v
+      encoding: "000011-----------110-----0100111"
+    - name: vsoxei64_v
+      encoding: "000011-----------111-----0100111"
